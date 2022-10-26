@@ -1,0 +1,22 @@
+version: '3.1'
+services:
+  harvester_pipeline_main:
+    build: .
+    image: harvester_pipeline:latest
+    container_name: harvester_pipeline_main
+    environment:
+      - GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
+      - GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1
+    ports:
+      - "50051:50051"
+    volumes:
+    - ./:/app
+    - ./logs:/app/logs
+
+    stdin_open: true
+    tty: true
+
+networks:
+  default:
+    name: kafka
+    external: true
