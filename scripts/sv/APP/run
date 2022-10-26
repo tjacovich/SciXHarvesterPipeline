@@ -1,0 +1,3 @@
+#!/bin/bash -e
+exec 2>&1
+exec chpst -u ads python3 /app/harvester/harvester_temp.py
