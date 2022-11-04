@@ -13,9 +13,8 @@ class Status(enum.Enum):
 
 class gRPC_status(Base):
     """
-    User table
-    Foreign-key absolute_uid is the primary key of the user in the user
-    database microservice.
+    gRPC table
+    table containing the given status of every job passed through the gRPC API
     """
     __tablename__ = 'grpc_status'
     id = Column(Integer, primary_key=True)
