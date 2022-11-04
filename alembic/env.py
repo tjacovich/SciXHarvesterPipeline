@@ -21,14 +21,14 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 #target_metadata = None
-from adsputils import load_config
+from harvester.db import load_config
 
 opath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 app_conf = load_config(proj_home=opath)
 
 if opath not in sys.path:
     sys.path.insert(0, opath)
-from harvester import models
+import harvester.models as models
 
 target_metadata = models.Base.metadata
 # this is the Alembic Config object, which provides

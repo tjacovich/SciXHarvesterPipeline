@@ -18,7 +18,7 @@ from contextlib import contextmanager
 
 sys.path.append("/app/")
 
-import harvester_gRPC.gRPCHarvester.db as db
+import harvester.db as db
 
 proj_home = os.path.realpath('../')
 config = db.load_config(proj_home=proj_home)
@@ -45,7 +45,7 @@ class Harvester_APP:
         self.engine = create_engine(config.get('SQLALCHEMY_URL'))
         self.Session = sessionmaker(self.engine)    
 
-def Harvester_task(consumer, producer):
+def Harvester_task(consumer):
     while True:
         msg = _consume_from_topic(consumer)
         if msg:
@@ -69,8 +69,8 @@ def Harvester_task(consumer, producer):
                     Finish = True
                     break
             if not Finish:
-                job_request["status"] = "Done"
-                db.update_job_status(app, job_request["hash"], status = "Done")                
+                job_request["status"] = 'Success'
+                db.update_job_status(app, job_request["hash"], status = job_request["status"])                
                 tstamp = datetime.now()            
                 logger.info(b'Done %s.' % bytes(str(tstamp), 'utf-8'))
         else:
@@ -83,9 +83,9 @@ if __name__ == "__main__":
     logger=logging.getLogger(__name__)
     logger.info("Starting Harvester Service")
     logger.info(config)
-    consumer = Consumer({'bootstrap.servers':config.get("KAFKA_BROKER"), 'auto.offset.reset':'latest', 'group.id': 'HarvesterPipeline1'})
+    consumer = Consumer({'bootstrap.servers': config.get("KAFKA_BROKER"), 'auto.offset.reset': 'latest', 'group.id': 'HarvesterPipeline1'})
     consumer.subscribe(['Harvester'])
-    producer = Producer({'bootstrap.servers':config.get("KAFKA_BROKER")})
+    producer = Producer({'bootstrap.servers': config.get("KAFKA_BROKER")})
     app = Harvester_APP()
-    Harvester_task(consumer, producer)
+    Harvester_task(consumer)
 
