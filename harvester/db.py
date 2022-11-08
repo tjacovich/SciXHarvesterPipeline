@@ -53,7 +53,7 @@ def write_job_status(cls, job_request, only_status = None):
     with cls.session_scope() as session:
         job_status = models.gRPC_status()
         job_status.job_hash = job_request.get("hash")
-        job_status.job_request = job_request.get("job_request")
+        job_status.job_request = job_request.get("task")
         job_status.status = job_request.get("status")
         job_status.timestamp = datetime.datetime.now()
         session.add(job_status)
