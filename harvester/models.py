@@ -1,4 +1,3 @@
-from sqlalchemy.types import TypeDecorator
 from sqlalchemy.ext.declarative import declarative_base
 import enum
 from sqlalchemy import Column, Integer, String, DateTime, Enum
