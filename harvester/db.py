@@ -10,8 +10,21 @@ import imp
 import inspect
 import json
 import ast
+import redis
 
 logger.basicConfig(level=logger.DEBUG)
+
+def write_status_redis(redis_instance, status):
+    redis_instance.publish('harvester_statuses', status)
+    
+def get_status_redis(redis_instance):
+    sub = redis_instance.pubsub()    
+    sub.subscribe('harvester_statuses') 
+    status = None   
+    for message in sub.listen():    
+        if message is not None and isinstance(message, dict):    
+            status = message.get('data')
+    return status
 
 def get_job_status_by_job_hash(cls, job_hashes, only_status = None):
     """
