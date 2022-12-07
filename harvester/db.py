@@ -15,16 +15,21 @@ import redis
 logger.basicConfig(level=logger.DEBUG)
 
 def write_status_redis(redis_instance, status):
+    logger.debug("Publishing status: {}".format(status))
     redis_instance.publish('harvester_statuses', status)
     
-def get_status_redis(redis_instance):
-    sub = redis_instance.pubsub()    
-    sub.subscribe('harvester_statuses') 
-    status = None   
-    for message in sub.listen():    
-        if message is not None and isinstance(message, dict):    
-            status = message.get('data')
-    return status
+def get_status_redis(subscription):
+    status = None
+    logger.debug("Listening for harvester status updates")   
+    for message in subscription.listen():
+        logger.debug("Message from redis: {}".format(message))    
+        if message is not None and isinstance(message, dict):
+            if message.get('data') != 1:
+                logger.debug("data: {}".format(message.get('data')))
+                status = message.get('data')
+                logger.debug("status: {}".format(status))
+                return status
+
 
 def get_job_status_by_job_hash(cls, job_hashes, only_status = None):
     """

@@ -68,6 +68,7 @@ def Harvester_task(consumer):
                 #     logger.info(b'Error')
                 #     Finish = True
                 #     break
+                logger.debug("Loop: {}".format(i))
             if not Finish:
                 job_request["status"] = 'Success'
                 db.update_job_status(app, job_request["hash"], status = job_request["status"])

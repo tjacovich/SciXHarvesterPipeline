@@ -3,3 +3,4 @@ venv/
 __pycache__
 logs/
 local_config.py
+cache/
