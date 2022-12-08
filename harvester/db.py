@@ -18,7 +18,7 @@ def write_status_redis(redis_instance, status):
     logger.debug("Publishing status: {}".format(status))
     redis_instance.publish('harvester_statuses', status)
     
-def get_status_redis(subscription):
+def get_status_redis(subscription, job_id):
     status = None
     logger.debug("Listening for harvester status updates")   
     for message in subscription.listen():
@@ -26,8 +26,10 @@ def get_status_redis(subscription):
         if message is not None and isinstance(message, dict):
             if message.get('data') != 1:
                 logger.debug("data: {}".format(message.get('data')))
-                status = message.get('data')
-                logger.debug("status: {}".format(status))
+                status_dict = json.loads(message.get('data'))
+                if status_dict['job_id'] == job_id:
+                    status = status_dict['status']
+                    logger.debug("status: {}".format(status))
                 return status
 
 
