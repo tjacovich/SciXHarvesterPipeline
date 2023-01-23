@@ -1,7 +1,4 @@
 import os
-from typing import OrderedDict
-from psycopg2 import IntegrityError
-from dateutil.tz import tzutc
 import harvester.models as models
 import datetime
 import logging as logger
@@ -10,7 +7,6 @@ import imp
 import inspect
 import json
 import ast
-import redis
 
 logger.basicConfig(level=logger.DEBUG)
 
