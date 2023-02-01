@@ -16,5 +16,7 @@ SCHEMA_ID = '1'
 #AWS Configuration
 AWS_ACCESS_KEY_ID = 'CHANGEME'
 AWS_SECRET_ACCESS_KEY = 'SECRETS'
-REGION_NAME = 'us-east-1'
+AWS_DEFAULT_REGION = 'us-east-1'
 PROFILE_NAME = 'SESSION_PROFILE'
+#OAI Harvesting urls
+ARXIV_OAI_URL='https://export.arxiv.org/oai2'

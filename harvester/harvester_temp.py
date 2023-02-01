@@ -47,9 +47,9 @@ class Harvester_APP:
 
     def __init__(self):
         self.engine = create_engine(config.get('SQLALCHEMY_URL'))
-        self.s3_client = boto3.client('s3')
+        self.s3_methods = s3(boto3.client('s3'))
         self.Session = sessionmaker(self.engine)
-        self.redis = redis.StrictRedis(config.get('REDIS_HOST', 'locahost'), config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
+        self.redis = redis.StrictRedis(config.get('REDIS_HOST', 'localhost'), config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
     
 
 def Harvester_task(consumer):
@@ -77,7 +77,7 @@ def Harvester_task(consumer):
                     date = record.get("date")
                     file_path = "/{}/{}".format(arxiv_dir, arxiv_name)
 
-                    etag = s3.write_object_s3(file_bytes=bytes(record_xml), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
+                    etag = app.s3_methods.write_object_s3(file_bytes=bytes(record_xml), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
                     if etag:
                         arxiv_id = "{}.{}".format(arxiv_dir, arxiv_name)
                         existing_record = db.get_arxiv_record(arxiv_id)

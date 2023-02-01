@@ -5,4 +5,4 @@ LOG_STDOUT = True
 SQLALCHEMY_URL = 'postgres://postgres@localhost:5432/gRPC_status'
 SQLALCHEMY_ECHO = False
 KAFKA_BROKER='kafka:9092'
-ARXIV_OAI_URL=''
+
