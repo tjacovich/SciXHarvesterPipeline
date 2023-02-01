@@ -21,3 +21,16 @@ class gRPC_status(Base):
     job_request = Column(String)
     status = Column(Enum(Status))
     timestamp = Column(DateTime)
+
+class ArXiV_record(Base):
+    """
+    ArXiV records table
+    table containing the relevant information for harvested arxiv records.
+    """
+    __tablename__ = 'arxiv_records'
+    id = Column(Integer)
+    arxiv_id = Column(String, unique=True, primary_key=True)
+    s3_key = Column(String)
+    raw_xml = Column(String)
+    date = Column(DateTime)
+    etag = Column(String)

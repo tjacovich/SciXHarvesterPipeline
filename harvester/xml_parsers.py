@@ -23,7 +23,7 @@ class Split_ListRecords(arxiv_xml_parsers):
                 split_record = ListRecord(record.get('identifier'), record.get('datestamp'), record.get('contents'))
             except:
                 try:
-                    yield self.resumptionToken
+                    yield {'resumptionToken': self.resumptionToken}
                 except Exception as e:
                     logger.error("Generator failed with exception: {}".format(e))
                     

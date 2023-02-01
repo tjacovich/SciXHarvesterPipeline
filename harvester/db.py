@@ -92,6 +92,23 @@ def update_job_status(cls, job_hash, status = None):
             updated = True
     return updated
 
+def write_arxiv_record(cls, arxiv_id, raw_xml, date, s3_key, etag):
+    """
+    Write harvested record to db. 
+    """
+    sucess = False
+    with cls.session_scope() as session:
+        arxiv_record = models.arxiv_record()
+        arxiv_record.arxiv_id = arxiv_id
+        arxiv_record.raw_xml = raw_xml
+        arxiv_record.s3_key = s3_key
+        arxiv_record.date = date
+        arxiv_record.etag = etag
+        session.add(arxiv_record)
+        session.commit()
+        success = True
+        
+    return success
 
 def load_config(proj_home=None, extra_frames=0, app_name=None):
     """
