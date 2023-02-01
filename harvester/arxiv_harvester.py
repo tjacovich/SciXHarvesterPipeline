@@ -1,11 +1,40 @@
 from OAIHarvester import OAIHarvester as OAI
 import time
 import logging as logger
-
+import db
 import xml_parsers
 import re
 
 MAX_RETRIES = 5
+def arxiv_harvesting(app, job_request, config, producer):
+    datestamp = job_request["task_args"].get("datestamp")
+    resumptionToken = job_request["task_args"].get("resumptionToken")
+    harvester = ArXiV_Harvester(config.get("ARXIV_OAI_URL"), daterange=datestamp, resumptionToken=resumptionToken)
+    success = False
+    for record in harvester:
+        arxiv_id = record.get("identifier")
+        arxiv_dir, arxiv_name = harvester.arxiv_id_regex(arxiv_id)
+        record_xml = record.get("xml")
+        date = record.get("date")
+        file_path = "/{}/{}".format(arxiv_dir, arxiv_name)
+
+        etag = app.s3_methods.write_object_s3(file_bytes=bytes(record_xml), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
+        if etag:
+            arxiv_id = "{}.{}".format(arxiv_dir, arxiv_name)
+            existing_record = db.get_arxiv_record(arxiv_id)
+            s3_key = file_path
+            if not existing_record:
+                produce = db.write_arxiv_record(app, arxiv_id, record_xml, date, s3_key, etag)
+
+            elif existing_record.etag != etag:
+                produce = db.update_arxiv_record(record_xml, date, etag)
+
+            if produce:
+                #placeholder code for producing to harvester output topic.
+                producer.produce()
+    success = True
+    
+    return success
 
 class ArXiV_Harvester(OAI):
     def __init__(self, harvest_url, daterange, resumptionToken):
