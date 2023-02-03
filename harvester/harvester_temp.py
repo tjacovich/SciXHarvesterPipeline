@@ -56,7 +56,6 @@ def Harvester_task(consumer):
     while True:
         msg = _consume_from_topic(consumer)
         if msg:
-            Finish = False
             tstamp = datetime.now()
             logger.debug("Received message {}".format(msg.value()))
             job_request = msg.value()
@@ -68,7 +67,6 @@ def Harvester_task(consumer):
             if job_request.get("task") == "ARXIV":
                 job_request["status"] = arxiv_harvesting(app, job_request, producer)
 
-            job_request["status"] = 'Success'
             db.update_job_status(app, job_request["hash"], status = job_request["status"])
             db.write_status_redis(app.redis, json.dumps({"job_id":job_request["hash"], "status":job_request["status"]}))
             tstamp = datetime.now()            
