@@ -10,7 +10,6 @@ def arxiv_harvesting(app, job_request, config, producer):
     datestamp = job_request["task_args"].get("datestamp")
     resumptionToken = job_request["task_args"].get("resumptionToken")
     harvester = ArXiV_Harvester(config.get("ARXIV_OAI_URL"), daterange=datestamp, resumptionToken=resumptionToken)
-    success = False
     for record in harvester:
         arxiv_id = record.get("identifier")
         arxiv_dir, arxiv_name = harvester.arxiv_id_regex(arxiv_id)
@@ -32,9 +31,10 @@ def arxiv_harvesting(app, job_request, config, producer):
             if produce:
                 #placeholder code for producing to harvester output topic.
                 producer.produce()
-    success = True
+        else:
+            return "Error"
     
-    return success
+    return "Success"
 
 class ArXiV_Harvester(OAI):
     def __init__(self, harvest_url, daterange, resumptionToken):
