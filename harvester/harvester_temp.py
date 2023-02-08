@@ -52,7 +52,7 @@ class Harvester_APP:
         self.redis = redis.StrictRedis(config.get('REDIS_HOST', 'localhost'), config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
     
 
-def Harvester_task(consumer):
+def Harvester_task(consumer, producer):
     while True:
         msg = _consume_from_topic(consumer)
         if msg:
@@ -98,5 +98,5 @@ if __name__ == "__main__":
     consumer.subscribe(['Harvester'])
     producer = AvroProducer({'bootstrap.servers': config.get("KAFKA_BROKER"), 'schema.registry.url': config.get("SCHEMA_REGISTRY_URL")})
     app = Harvester_APP()
-    Harvester_task(consumer)
+    Harvester_task(consumer, producer)
 
