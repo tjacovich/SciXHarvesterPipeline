@@ -4,6 +4,7 @@ import logging as logger
 import db
 from adsingestp.parsers import arxiv
 import re
+import uuid
 
 MAX_RETRIES = 5
 def arxiv_harvesting(app, job_request, config, producer):
@@ -11,26 +12,19 @@ def arxiv_harvesting(app, job_request, config, producer):
     resumptionToken = job_request["task_args"].get("resumptionToken")
     harvester = ArXiV_Harvester(config.get("ARXIV_OAI_URL"), daterange=datestamp, resumptionToken=resumptionToken)
     for record in harvester:
-        arxiv_id = record.get("identifier")
-        arxiv_dir, arxiv_name = harvester.arxiv_id_regex(arxiv_id)
-        record_xml = record.get("xml")
-        date = record.get("date")
-        file_path = "/{}/{}".format(arxiv_dir, arxiv_name)
+        record_id = uuid.uuid4()
+        file_path = "/{}/{}".format(datestamp, record_id)
 
-        etag = app.s3_methods.write_object_s3(file_bytes=bytes(record_xml), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
+        etag = app.s3_methods.write_object_s3(file_bytes=bytes(record), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
         if etag:
-            arxiv_id = "{}.{}".format(arxiv_dir, arxiv_name)
-            existing_record = db.get_arxiv_record(arxiv_id)
+            existing_record = db.get_arxiv_record(record_id)
             s3_key = file_path
             if not existing_record:
-                produce = db.write_arxiv_record(app, arxiv_id, record_xml, date, s3_key, etag)
-
-            elif existing_record.etag != etag:
-                produce = db.update_arxiv_record(record_xml, date, etag)
+                produce = db.write_arxiv_record(app, record_id, record, datestamp, s3_key, etag)
 
             if produce:
                 #placeholder code for producing to harvester output topic.
-                producer_message = {"arxiv_id": arxiv_id, "xml": record_xml}
+                producer_message = {"record_id": record_id, "xml": record, "source": job_request.get("task")}
                 producer.produce(topic=config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=config.get('HARVESTER_OUTPUT_SCHEMA'))
         else:
             return "Error"
@@ -50,7 +44,7 @@ class ArXiV_Harvester(OAI):
         """
         Simple regex for pulling the id from the arxix url.
         """
-        pattern = re.compile(r"https://arxiv.org/abs/([0-9]{4}).([0-9]{5})")
+        pattern = re.compile(r"https://arxiv.org/abs/([0-9]{4}).([0-9]+)")
         return pattern.match(arxiv_id).group(1), pattern.match(arxiv_id).group(2)
 
     def harvest_arxiv(self, daterange, resumptionToken = None):

@@ -1,6 +1,8 @@
 from sqlalchemy.ext.declarative import declarative_base
 import enum
+import uuid
 from sqlalchemy import Column, Integer, String, DateTime, Enum
+from sqlalchemy.dialects.postgresql import UUID
 
 Base = declarative_base()
 
@@ -9,6 +11,13 @@ class Status(enum.Enum):
     Processing = 2
     Error = 3
     Success = 4
+
+class Source(enum.Enum):
+    ArXiV = 1
+    APS = 2
+    AAS = 3
+    MNRAS = 4
+    PNAAS = 5
 
 class gRPC_status(Base):
     """
@@ -22,15 +31,14 @@ class gRPC_status(Base):
     status = Column(Enum(Status))
     timestamp = Column(DateTime)
 
-class ArXiV_record(Base):
+class Harvester_record(Base):
     """
     ArXiV records table
     table containing the relevant information for harvested arxiv records.
     """
-    __tablename__ = 'arxiv_records'
-    id = Column(Integer)
-    arxiv_id = Column(String, unique=True, primary_key=True)
+    __tablename__ = 'harvester_records'
+    id = Column(UUID, primary_key=True, default=uuid.uuid4)
     s3_key = Column(String)
-    raw_xml = Column(String)
     date = Column(DateTime)
     etag = Column(String)
+    source = Column(Enum(Source))
