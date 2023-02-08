@@ -92,54 +92,43 @@ def update_job_status(cls, job_hash, status = None):
             updated = True
     return updated
 
-def write_arxiv_record(cls, arxiv_id, raw_xml, date, s3_key, etag):
+def write_harvester_record(cls, record_id, date, s3_key, etag, source):
     """
     Write harvested record to db. 
     """
     success = False
     with cls.session_scope() as session:
-        arxiv_record = models.arxiv_record()
-        arxiv_record.arxiv_id = arxiv_id
-        arxiv_record.raw_xml = raw_xml
-        arxiv_record.s3_key = s3_key
-        arxiv_record.date = date
-        arxiv_record.etag = etag
-        session.add(arxiv_record)
+        harvester_record = models.Harvester_record()
+        harvester_record.record_id = record_id
+        harvester_record.s3_key = s3_key
+        harvester_record.date = date
+        harvester_record.etag = etag
+        harvester_record.source = source
+        session.add(harvester_record)
         session.commit()
         success = True  
     return success
 
-def get_arxiv_record(cls, arxiv_ids):
+def get_harvester_record(cls, record_ids):
     """
     Return all updates with job_hash
     """
     with cls.session_scope() as session:
         logger.info("Opening Session")
-        for arxiv_id in arxiv_ids:
-            record_db = session.query(models.ArXiV_record).filter(models.ArXiV_record.arxiv_id == arxiv_id).first()    
+        for record_id in record_ids:
+            record_db = session.query(models.Harvester_record).filter(models.Harvester_record.record_id == record_id).first()    
     return record_db
 
-def _get_arxiv_record_by_id(session, arxiv_id, only_status = None):
+def _get_harvester_record_by_id(session, record_id, only_status = None):
     """
     Return all updates with job_hash
     """
     status = None
     logger.info("Opening Session")
-    record_db = session.query(models.ArXiV_record).filter(models.ArXiV_record.arxiv_id == arxiv_id).first() 
+    record_db = session.query(models.Harvester_record).filter(models.Harvester_record.arxiv_id == record_id).first() 
     if record_db:
-        logger.info("Found record: {}".format(record_db.job_hash))
+        logger.info("Found record: {}".format(record_db.record_id))
     return record_db
-
-def update_arxiv_record(cls, arxiv_id, raw_xml, etag):
-    success = False
-    with cls.session_scope() as session:
-        arxiv_record = _get_arxiv_record_by_id(session, arxiv_id)
-        arxiv_record.raw_xml = raw_xml
-        arxiv_record.etag = etag
-        session.add(arxiv_record)
-        session.commit()
-        success = True  
-    return success
 
 def load_config(proj_home=None, extra_frames=0, app_name=None):
     """
