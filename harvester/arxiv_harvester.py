@@ -5,10 +5,12 @@ import db
 from adsingestp.parsers import arxiv
 import re
 import uuid
+from datetime import datetime
 
 MAX_RETRIES = 5
+
 def arxiv_harvesting(app, job_request, config, producer):
-    datestamp = job_request["task_args"].get("datestamp")
+    datestamp = datetime.now()
     resumptionToken = job_request["task_args"].get("resumptionToken")
     harvester = ArXiV_Harvester(config.get("ARXIV_OAI_URL"), daterange=datestamp, resumptionToken=resumptionToken)
     for record in harvester:
@@ -17,10 +19,8 @@ def arxiv_harvesting(app, job_request, config, producer):
 
         etag = app.s3_methods.write_object_s3(file_bytes=bytes(record), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
         if etag:
-            existing_record = db.get_arxiv_record(record_id)
             s3_key = file_path
-            if not existing_record:
-                produce = db.write_arxiv_record(app, record_id, record, datestamp, s3_key, etag)
+            produce = db.write_harvester_record(app, record_id, record, datestamp, s3_key, etag, job_request.get("task"))
 
             if produce:
                 #placeholder code for producing to harvester output topic.
@@ -28,7 +28,7 @@ def arxiv_harvesting(app, job_request, config, producer):
                 producer.produce(topic=config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=config.get('HARVESTER_OUTPUT_SCHEMA'))
         else:
             return "Error"
-    
+
     return "Success"
 
 class ArXiV_Harvester(OAI):
@@ -40,12 +40,6 @@ class ArXiV_Harvester(OAI):
         self.parsed_records = self.harvest_arxiv(harvest_url, daterange, resumptionToken)
 
     @staticmethod
-    def arxiv_id_regex(arxiv_id):
-        """
-        Simple regex for pulling the id from the arxix url.
-        """
-        pattern = re.compile(r"https://arxiv.org/abs/([0-9]{4}).([0-9]+)")
-        return pattern.match(arxiv_id).group(1), pattern.match(arxiv_id).group(2)
 
     def harvest_arxiv(self, daterange, resumptionToken = None):
         """
@@ -89,23 +83,16 @@ class ArXiV_Harvester(OAI):
     def __next__(self):
         try:
             record = next(self.parsed_records)
-            identifier = self.extract_arxiv_identifier(record)
         except:
             try:
-                self.extract_resumptionToken(self.raw_xml)
-            except Exception as e:
-                logger.error("ArXiv Harvesting failed to extract resumption token")
-            self.harvest_arxiv(daterange=self.daterange, resumptionToken=record.get('resumptionToken'))
-            record = next(self.parsed_records)
+                resumptionToken = self.extract_resumptionToken(self.raw_xml)
+            except:
+                logger.debug("Harvesting has finished")
+            if resumptionToken:
+                self.harvest_arxiv(daterange=self.daterange, resumptionToken=resumptionToken)
+                record = next(self.parsed_records)  
         
         yield record
-
-    @staticmethod
-    def extract_arxiv_identifier(record):
-        arxiv_parser = arxiv.MultiArxivParser()
-        token_text = arxiv_parser.get_chunks(record, r"\<header\>", r"\</header>")
-        pattern = re.compile(r"oai:arXiv.org:[0-9]{4}.[0-9]{5}")
-        pattern.search(token_text)[0]
 
     @staticmethod
     def extract_resumptionToken(raw_xml):
