@@ -1,7 +1,7 @@
-from OAIHarvester import OAIHarvester as OAI
+from harvester.base.OAIHarvester import OAIHarvester as OAI
 import time
 import logging as logger
-import db
+from harvester import db
 from adsingestp.parsers import arxiv
 import re
 import uuid

@@ -1,4 +1,4 @@
 #!/bin/bash -e
 exec 2>&1
 #APP_DIR=harvester_gRPC
-exec chpst -u ads bash -c 'cd /app/$APP_DIR/harvester/ && python3 harvester_temp.py'
+exec chpst -u ads bash -c 'cd /app/$APP_DIR/ && python3 run.py'
