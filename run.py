@@ -7,11 +7,10 @@ import sys
 
 sys.path.append("/app/")
 
-import harvester.db as db
-import harvester.harvester as harvester
+from harvester import harvester, utils
 
 proj_home = os.path.realpath('/app/')
-config = db.load_config(proj_home=proj_home)
+config = utils.load_config(proj_home=proj_home)
 
 if __name__ == "__main__":
     app = harvester.Harvester_APP(config)

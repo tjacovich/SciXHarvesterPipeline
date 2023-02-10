@@ -1,8 +1,0 @@
-#LOGGING_LEVEL = 'WARN'
-#LOGGING_LEVEL = 'DEBUG'
-LOGGING_LEVEL = 'INFO'
-LOG_STDOUT = True
-SQLALCHEMY_URL = 'postgres://postgres@localhost:5432/gRPC_status'
-SQLALCHEMY_ECHO = False
-KAFKA_BROKER='kafka:9092'
-

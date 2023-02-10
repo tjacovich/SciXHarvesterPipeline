@@ -16,7 +16,7 @@ def arxiv_harvesting(app, job_request, config, producer):
     for record in harvester:
         record_id = uuid.uuid4()
         file_path = "/{}/{}".format(datestamp, record_id)
-
+        
         etag = app.s3_methods.write_object_s3(file_bytes=bytes(record), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
         if etag:
             s3_key = file_path
