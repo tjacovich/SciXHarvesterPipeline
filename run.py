@@ -3,7 +3,6 @@ from confluent_kafka.avro import AvroProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 
 import os
-import sys
 
 from harvester import harvester, utils
 
