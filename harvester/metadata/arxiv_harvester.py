@@ -37,7 +37,7 @@ def arxiv_harvesting(app, job_request, config, producer):
 
             if produce:
                 producer_message = {"record_id": record_id, "record_xml": record, "source": job_request.get("task")}
-                producer.produce(topic=config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=config.get('HARVESTER_OUTPUT_SCHEMA'))
+                producer.produce(topic=config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=harvester_output_schema)
         else:
             return "Error"
 
