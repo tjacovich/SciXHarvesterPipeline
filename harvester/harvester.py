@@ -3,7 +3,6 @@ import time
 import logging
 import json
 import json
-import sys
 import redis
 import boto3
 
@@ -13,8 +12,6 @@ from contextlib import contextmanager
 
 from harvester.metadata.arxiv_harvester import arxiv_harvesting
 import harvester.s3_methods as s3_methods
-
-sys.path.append("/app/")
 
 from harvester import db, utils
 
