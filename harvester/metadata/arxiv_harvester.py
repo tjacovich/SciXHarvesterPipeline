@@ -24,7 +24,7 @@ def arxiv_harvesting(app, job_request, config, producer):
 
             if produce:
                 #placeholder code for producing to harvester output topic.
-                producer_message = {"record_id": record_id, "xml": record, "source": job_request.get("task")}
+                producer_message = {"record_id": record_id, "record_xml": record, "source": job_request.get("task")}
                 producer.produce(topic=config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=config.get('HARVESTER_OUTPUT_SCHEMA'))
         else:
             return "Error"
