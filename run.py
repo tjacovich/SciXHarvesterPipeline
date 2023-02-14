@@ -17,7 +17,7 @@ if __name__ == "__main__":
     schema_client = SchemaRegistryClient({'url': config.get("SCHEMA_REGISTRY_URL")})
     schema = app._get_schema(schema_client)
     consumer = AvroConsumer({'bootstrap.servers': config.get("KAFKA_BROKER"), 'schema.registry.url': config.get("SCHEMA_REGISTRY_URL"), 'auto.offset.reset': 'latest', 'group.id': 'HarvesterPipeline1'}, reader_value_schema = schema)
-    consumer.subscribe(['Harvester'])
+    consumer.subscribe(config.get('HARVESTER_INPUT_TOPIC', 'Harvester'))
     producer = AvroProducer({'bootstrap.servers': config.get("KAFKA_BROKER"), 'schema.registry.url': config.get("SCHEMA_REGISTRY_URL")})
     app.logger.info("Starting Harvester APP")
     app.Harvester_task(consumer, producer)
