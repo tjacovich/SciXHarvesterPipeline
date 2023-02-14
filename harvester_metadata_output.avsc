@@ -18,9 +18,9 @@
         "type": {
             "name": "taskenum",
             "type": "enum",
-            "symbols" : ["ARXIV", "ELSEVIER", "IOP", "SIMBAD", "MONITOR"]
+            "symbols" : ["ARXIV", "ELSEVIER", "IOP", "SIMBAD"]
         }
-    },
+    }
   ]
 }
 
