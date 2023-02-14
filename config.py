@@ -13,8 +13,9 @@ KAFKA_BROKER = 'kafka:9092'
 SCHEMA_REGISTRY_URL = 'http://schema-registry:8081'
 #Harvester AVRO schema ID
 SCHEMA_ID = '1'
+HARVESTER_INPUT_SCHEMA= 'Harvester'
 HARVESTER_INPUT_TOPIC = 'Harvester'
-HARVESTER_OUTPUT_SCHEMA = '2'
+HARVESTER_OUTPUT_SCHEMA = 'HarvesterOutputSchema'
 HARVESTER_OUTPUT_TOPIC = 'HarvesterOutput'
 #AWS Configuration
 AWS_ACCESS_KEY_ID = 'CHANGEME'

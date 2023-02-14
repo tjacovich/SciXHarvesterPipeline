@@ -16,7 +16,7 @@ import harvester.s3_methods as s3_methods
 
 sys.path.append("/app/")
 
-import harvester.db as db
+from harvester import db, utils
 
 class Harvester_APP:
     @contextmanager
@@ -42,17 +42,18 @@ class Harvester_APP:
         self.logger.info("Starting Harvester Service")
         self.logger.info(self.config)
 
-    def __init__(self, config, start_s3=False):
-        self.engine = create_engine(config.get('SQLALCHEMY_URL'))
-        self.config = config
+    def __init__(self, proj_home, start_s3=False):
+        self.config = utils.load_config(proj_home)
+        self.engine = create_engine(self.config.get('SQLALCHEMY_URL'))
         self.logger = None
+        self.schema_client = None
         self._init_logger()
         if start_s3:
             self.s3Client = s3_methods(boto3.client('s3'))
         else:
             self.s3Client = None
         self.Session = sessionmaker(self.engine)
-        self.redis = redis.StrictRedis(config.get('REDIS_HOST', 'localhost'), config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
+        self.redis = redis.StrictRedis(self.config.get('REDIS_HOST', 'localhost'), self.config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
     
 
     def Harvester_task(self, consumer, producer):
@@ -79,13 +80,3 @@ class Harvester_APP:
                 self.logger.debug("No new messages")
                 time.sleep(2)
                 continue
-
-    def _get_schema(self, schema_client):          
-        try:
-            avro_schema = schema_client.get_schema(self.config.get("SCHEMA_ID"))
-            self.logger.info("Found schema: {}".format(avro_schema.schema_str))
-        except Exception as e:
-            avro_schema = None
-            self.logger.warning("Could not retrieve avro schema with exception: {}".format(e))
-
-        return avro_schema.schema_str
