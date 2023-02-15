@@ -101,7 +101,7 @@ class ArXiV_Harvester(OAI):
                     logger.exception("Failed to Harvest ArXiV records for daterange: {}".format(self.daterange))
                     raise e
 
-            self.parsed_records = arxiv.ArxivParser.parse(self.raw_xml)
+            self.parsed_records = iter(arxiv.ArxivParser.parse(self.raw_xml))
 
     def __next__(self):
         """
@@ -117,9 +117,9 @@ class ArXiV_Harvester(OAI):
             try:
                 resumptionToken = self.extract_resumptionToken(self.raw_xml)
             except:
-                logger.debug("Harvesting has finished")
+                logger.debug("No resumptionToken present")
             if resumptionToken:
-                self.harvest_arxiv(daterange=self.daterange, resumptionToken=resumptionToken)
+                self.harvest_arxiv(resumptionToken=resumptionToken)
                 record = next(self.parsed_records)  
         
         yield record
