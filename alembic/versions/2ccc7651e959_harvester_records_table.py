@@ -23,7 +23,7 @@ def upgrade() -> None:
     sa.Column('s3_key', sa.String(), nullable=True),
     sa.Column('date', sa.DateTime(), nullable=True),
     sa.Column('etag', sa.String(), nullable=True),
-    sa.Column('source', sa.Enum('ArXiV', 'APS', 'AAS', 'MNRAS', 'PNAAS', name='source'), nullable=True),
+    sa.Column('source', sa.Enum('ARXIV', 'APS', 'AAS', 'MNRAS', 'PNAAS', name='source'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

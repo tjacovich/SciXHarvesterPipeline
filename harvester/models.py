@@ -13,7 +13,7 @@ class Status(enum.Enum):
     Success = 4
 
 class Source(enum.Enum):
-    ArXiV = 1
+    ARXIV = 1
     APS = 2
     AAS = 3
     MNRAS = 4
