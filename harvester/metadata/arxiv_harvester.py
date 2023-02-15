@@ -74,8 +74,11 @@ class ArXiV_Harvester(OAI):
 
         while success != True:
             """
-            This loop sends the relevant request to the ArXiV API and checks to make sure we aren't receiving any flow control responses.
-            If we are it waits the specified amount of time before proceeding. If we repeatedly hit 503 or any other error, we stop.
+            This loop:
+            1. Sends the relevant request to the ArXiV API
+            2. Checks to make sure we aren't receiving any flow control responses.
+            3. If we are it waits the specified amount of time before proceeding. 
+            4. If we repeatedly hit 503 or any other error, we stop.
             """
             if not resumptionToken:
                 self.params['from'] = self.daterange
