@@ -59,8 +59,6 @@ class ArXiV_Harvester(OAI):
         self.raw_xml = None
         self.parsed_records = self.harvest_arxiv(harvest_url, resumptionToken)
 
-    @staticmethod
-
     def harvest_arxiv(self, resumptionToken = None):
         """
         daterange: (str) date with value given as YYYY-MM-DD
