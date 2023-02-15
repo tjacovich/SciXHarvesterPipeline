@@ -47,7 +47,6 @@ def _get_job_by_job_hash(session, job_hash, only_status = None):
     """
     Return all updates with job_hash
     """
-    status = None
     logger.info("Opening Session")
 
     if only_status:

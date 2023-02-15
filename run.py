@@ -1,11 +1,8 @@
 from confluent_kafka.avro import AvroConsumer
 from confluent_kafka.avro import AvroProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
-
-import os
-
 from harvester import harvester, utils
-
+import os
 
 if __name__ == "__main__":
     proj_home = os.path.realpath('/app/')
