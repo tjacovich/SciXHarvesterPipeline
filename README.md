@@ -13,7 +13,7 @@ Additionally, calling either command with `--persistence` will open a persistent
 
 ```bash
 #This command tells the server to initialize a job by adding a message to the Harvester Topic
-python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_INIT
+python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_INIT --task "ARXIV" --task_args '{"harvest_type": "metadata", "daterange": "YYYY-MM-DD"}'
 #This command asks the server to check on the current status of a job with <job_id>
-python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_MONITOR '<job_id>`
+python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_MONITOR --job_id '<job_id>'
 ```
