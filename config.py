@@ -3,7 +3,7 @@
 LOGGING_LEVEL = 'INFO'
 LOG_STDOUT = True
 #SQLALCHEMY Configuration
-SQLALCHEMY_URL = 'postgres://grpc_status:gRPC_status@postgres:5432/grpc_status'
+SQLALCHEMY_URL = 'postgres://harvester:harvester@postgres:5432/harvester'
 SQLALCHEMY_ECHO = False
 #REDIS Configuration
 REDIS_HOST = 'redis'
@@ -14,7 +14,7 @@ SCHEMA_REGISTRY_URL = 'http://schema-registry:8081'
 #Harvester AVRO Schema Parameters
 SCHEMA_ID = '1'
 HARVESTER_INPUT_SCHEMA= 'Harvester'
-HARVESTER_INPUT_TOPIC = 'Harvester'
+HARVESTER_INPUT_TOPIC = 'HarvesterInput'
 HARVESTER_OUTPUT_SCHEMA = 'HarvesterOutputSchema'
 HARVESTER_OUTPUT_TOPIC = 'HarvesterOutput'
 #AWS Configuration
