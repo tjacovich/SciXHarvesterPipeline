@@ -36,8 +36,7 @@ class Harvester_APP:
     def _init_logger(self):
         logging.basicConfig(level=logging.DEBUG)
         self.logger=logging.getLogger(__name__)
-        self.logger.info("Starting Harvester Service")
-        self.logger.info(self.config)
+        self.logger.info("Starting Harvester Service Logging")
 
     def __init__(self, proj_home, start_s3=False):
         self.config = utils.load_config(proj_home)

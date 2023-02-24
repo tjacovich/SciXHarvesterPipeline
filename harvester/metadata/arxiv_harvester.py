@@ -23,8 +23,10 @@ def arxiv_harvesting(app, job_request, config, producer):
     datestamp = datetime.now()
     resumptionToken = job_request["task_args"].get("resumptionToken")
     daterange = job_request["task_args"].get("daterange")
-    harvester = ArXiV_Harvester(config.get("ARXIV_OAI_URL"), daterange=daterange, resumptionToken=resumptionToken)
     harvester_output_schema = get_schema(app, app.schema_client, app.config.get('HARVESTER_OUTPUT_SCHEMA'))
+
+    harvester = ArXiV_Harvester(config.get("ARXIV_OAI_URL"), daterange=daterange, resumptionToken=resumptionToken)
+    
     for record in harvester:
         #Assign ID to new record
         record_id = uuid.uuid4()
