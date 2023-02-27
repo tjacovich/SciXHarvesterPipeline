@@ -13,7 +13,7 @@ KAFKA_BROKER = 'kafka:9092'
 SCHEMA_REGISTRY_URL = 'http://schema-registry:8081'
 #Harvester AVRO Schema Parameters
 SCHEMA_ID = '1'
-HARVESTER_INPUT_SCHEMA= 'Harvester'
+HARVESTER_INPUT_SCHEMA= 'HarvesterInputSchema'
 HARVESTER_INPUT_TOPIC = 'HarvesterInput'
 HARVESTER_OUTPUT_SCHEMA = 'HarvesterOutputSchema'
 HARVESTER_OUTPUT_TOPIC = 'HarvesterOutput'
