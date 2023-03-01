@@ -9,11 +9,11 @@ Currently, there are two methods that have been defined in the API for interacti
 - `HARVESTER_INIT`: Initialize a job with given `job_args` passed into the script as a JSON.
 - `HARVESTER_MONITOR`: Queries the status of a job with a given `<job_id>`
 
-currently, the only argument that can be passed with job_args is `"persistence"`, which is a boolean that tells the server whether to keep the connection open and stream updates to the client.
+Additionally, calling either command with `--persistence` will open a persistent connection that streams updates for the specificed job.
 
 ```bash
 #This command tells the server to initialize a job by adding a message to the Harvester Topic
-python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_INIT
+python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_INIT --task "ARXIV" --task_args '{"harvest_type": "metadata", "daterange": "YYYY-MM-DD"}'
 #This command asks the server to check on the current status of a job with <job_id>
-python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_MONITOR '<job_id>`
+python3 harvester_gRPC/gRPCHarvester/harvester_client.py HARVESTER_MONITOR --job_id '<job_id>'
 ```

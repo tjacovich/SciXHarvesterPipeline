@@ -7,6 +7,8 @@ services:
     environment:
       - GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
       - GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1
+    env_file:
+      - aws_env_vars.env
     ports:
       - "50051:50051"
     volumes:

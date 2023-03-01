@@ -4,3 +4,4 @@ __pycache__
 logs/
 local_config.py
 cache/
+aws_env_vars.env

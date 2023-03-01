@@ -2,3 +2,6 @@ confluent-kafka==1.9.2
 requests
 fastavro
 redis
+boto3==1.26.59
+adsingestp @ git+https://github.com/adsabs/ADSIngestParser.git@b1b18900e5c70b0c3f044443bed53b53c73942f4
+alembic

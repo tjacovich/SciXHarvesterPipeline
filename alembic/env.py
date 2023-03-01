@@ -21,7 +21,7 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 #target_metadata = None
-from harvester.db import load_config
+from harvester.utils import load_config
 
 opath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 app_conf = load_config(proj_home=opath)

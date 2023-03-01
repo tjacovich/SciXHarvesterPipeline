@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir -U -r dev-requirements.txt
 RUN pip install --no-cache-dir -U -r gRPC_dev-requirements.txt
 
 COPY scripts/entrypoint.sh /app
+COPY scripts/migrate_db.py /app/migrate_db.py
 
 COPY scripts/sv/ /etc/sv/
 COPY harvester_gRPC/scripts/sv /etc/sv
