@@ -1,4 +1,4 @@
-Test Harvester repository
+# Test Harvester Repository
 
 ![Harvester Pipeline Flowchart](README_assets/Harvester_implementation.png?raw=true "Harvester Pipeline Flowchart")
 
