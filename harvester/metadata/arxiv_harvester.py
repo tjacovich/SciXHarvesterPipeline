@@ -6,8 +6,6 @@ from harvester import db
 from adsingestp.parsers import arxiv
 import re
 import uuid
-import hashlib
-import os
 from datetime import datetime
 
 MAX_RETRIES = 5
