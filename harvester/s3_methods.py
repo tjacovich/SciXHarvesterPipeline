@@ -24,6 +24,7 @@ class s3_provider(s3_methods):
     def __init__(self, provider, config):
         if provider == 'AWS':
             self.s3 = boto3.client(s3_methods(boto3.client('s3')))
+            self.bucket = config.get('AWS_BUCKET_NAME')
 
 class load_s3:
     def __init__(self, config):
