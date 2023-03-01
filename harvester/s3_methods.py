@@ -8,10 +8,11 @@ class s3_methods:
     def write_object_s3(self, file_bytes, bucket, object_name):
         try:
             response = self.s3.put_object(Bucket=bucket, Body=file_bytes, Key=object_name)
+            logging.info(response)
         except ClientError as e:
             logging.error(e)
             raise e
-        return response.json().get('ETag')
+        return response.get('ETag')
     
     def get_object_s3(self, bucket, object_name):
         try:

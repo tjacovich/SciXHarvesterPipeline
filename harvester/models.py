@@ -37,7 +37,7 @@ class Harvester_record(Base):
     table containing the relevant information for harvested arxiv records.
     """
     __tablename__ = 'harvester_records'
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     s3_key = Column(String)
     date = Column(DateTime)
     etag = Column(String)

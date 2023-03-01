@@ -7,13 +7,13 @@ import json
 
 def get_schema(app, schema_client, schema_name):          
     try:
-        avro_schema = schema_client.get_latest_version(schema_name).schema
-        app.logger.info("Found schema: {}".format(avro_schema.schema_str))
+        avro_schema = schema_client.get_latest_version(schema_name)
+        app.logger.info("Found schema: {}".format(avro_schema.schema.schema_str))
     except Exception as e:
         avro_schema = None
         app.logger.warning("Could not retrieve avro schema with exception: {}".format(e))
 
-    return avro_schema.schema_str
+    return avro_schema.schema.schema_str
 
 def load_config(proj_home=None, extra_frames=0, app_name=None):
     """

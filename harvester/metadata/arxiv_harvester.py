@@ -6,41 +6,44 @@ from harvester import db
 from adsingestp.parsers import arxiv
 import re
 import uuid
+import hashlib
+import os
 from datetime import datetime
 
 MAX_RETRIES = 5
 
-def arxiv_harvesting(app, job_request, config, producer):
+def arxiv_harvesting(app, job_request, producer):
     """
     Main harvesting routine for arxiv metadata. 
     
     job_request: (json) task message passed to Harvester input topic.
-    config: (json) The imported configuration of the Harvester app.
     producer: The harvester kafka producer instance
 
     return: (str) The final state of the harvesting process.
     """
-    datestamp = datetime.now()
+    datestamp = datetime.now().strftime("%Y%m%d")
+    if not os.path.isdir(datestamp): os.mkdir(datestamp)
     resumptionToken = job_request["task_args"].get("resumptionToken")
     daterange = job_request["task_args"].get("daterange")
+    app.logger.info("{}, {}, {}".format(daterange, resumptionToken, datestamp))
     harvester_output_schema = get_schema(app, app.schema_client, app.config.get('HARVESTER_OUTPUT_SCHEMA'))
-
-    harvester = ArXiV_Harvester(config.get("ARXIV_OAI_URL"), daterange=daterange, resumptionToken=resumptionToken)
     
+    harvester = ArXiV_Harvester(app.config.get("ARXIV_OAI_URL"), daterange=daterange, resumptionToken=resumptionToken)
+
     for record in harvester:
         #Assign ID to new record
         record_id = uuid.uuid4()
         #Generate filepath for S3
         file_path = "/{}/{}".format(datestamp, record_id)
         #write record to S3
-        etag = app.s3_methods.write_object_s3(file_bytes=bytes(record), bucket=config.get('ARXIV_S3_BUCKET'), object_name=file_path)
-        if etag:
+        etag = app.s3Client.write_object_s3(file_bytes=bytes(record, 'utf-8'), bucket=app.config.get('BUCKET_NAME'), object_name=file_path)
+        local_etag = hashlib.md5(bytes(record, 'utf-8')).hexdigest()
+        if etag and (etag == local_etag):
             s3_key = file_path
-            produce = db.write_harvester_record(app, record_id, record, datestamp, s3_key, etag, job_request.get("task"))
-
+            produce = db.write_harvester_record(app, record_id, datetime.now(), s3_key, str(etag), job_request.get("task"))
             if produce:
-                producer_message = {"record_id": record_id, "record_xml": record, "source": job_request.get("task")}
-                producer.produce(topic=config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=harvester_output_schema)
+                producer_message = {"record_id": str(record_id), "record_xml": record, "task": job_request.get("task")}
+                producer.produce(topic=app.config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=harvester_output_schema)
         else:
             return "Error"
 
@@ -60,7 +63,8 @@ class ArXiV_Harvester(OAI):
         self.params = {'metadataPrefix': 'oai_dc'}
         self.daterange = daterange
         self.raw_xml = None
-        self.parsed_records = self.harvest_arxiv(harvest_url, resumptionToken)
+        self.fullHarvest = False
+        self.parsed_records = self.harvest_arxiv(resumptionToken)
 
     def harvest_arxiv(self, resumptionToken = None):
         """
@@ -90,7 +94,7 @@ class ArXiV_Harvester(OAI):
 
             try:
                 raw_response = self.ListRecords(self.url, self.params)
-                self.raw_xml = raw_response.content
+                self.raw_xml = raw_response.text
                 success = True
             except  Exception as e:
                 """
@@ -103,10 +107,10 @@ class ArXiV_Harvester(OAI):
                 else:
                     logger.exception("Failed to Harvest ArXiV records for daterange: {}".format(self.daterange))
                     raise e
+            arxivparser = arxiv.MultiArxivParser()
+            return arxivparser.parse(self.raw_xml)
 
-            self.parsed_records = iter(arxiv.ArxivParser.parse(self.raw_xml))
-
-    def __next__(self):
+    def __iter__(self):
         """
         Iterate through all parsed records. 
         If next(self.parsed_records) fails, we attempt to extract a resumptionToken and then rerun the harvest process with the token.
@@ -114,18 +118,20 @@ class ArXiV_Harvester(OAI):
         return: 
             record: (str) XML of a single ArXiv record
         """
-        try:
-            record = next(self.parsed_records)
-        except:
+
+        while not self.fullHarvest:
+            for record in self.parsed_records:
+                yield record
             try:
                 resumptionToken = self.extract_resumptionToken(self.raw_xml)
             except:
+                resumptionToken = None
                 logger.debug("No resumptionToken present")
             if resumptionToken:
-                self.harvest_arxiv(resumptionToken=resumptionToken)
-                record = next(self.parsed_records)  
+                self.parsed_records = self.harvest_arxiv(resumptionToken=resumptionToken)
+            else:
+                self.fullHarvest = True
         
-        yield record
 
     @staticmethod
     def extract_resumptionToken(raw_xml):
@@ -137,7 +143,7 @@ class ArXiV_Harvester(OAI):
         return: (str) ArXiv resumptionToken
         """
         arxiv_parser = arxiv.MultiArxivParser()
-        token_text = arxiv_parser.get_chunks(raw_xml, r"<resumptionToken", r"</resumptionToken>")
+        token_text = next(arxiv_parser.get_chunks(raw_xml, r"<resumptionToken", r"</resumptionToken>"))
         pattern = re.compile(r"[0-9]+\|[0-9]+")
         return pattern.search(token_text)[0]
 

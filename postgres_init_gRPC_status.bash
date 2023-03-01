@@ -7,4 +7,3 @@ docker exec -it postgres bash -c "psql -c \"CREATE ROLE harvester WITH LOGIN PAS
 docker exec -it postgres bash -c "psql -c \"CREATE DATABASE harvester;\""
 docker exec -it postgres bash -c "psql -c \"GRANT CREATE ON DATABASE harvester TO harvester;\""
 docker exec -it postgres bash -c "psql -c \"GRANT CREATE ON DATABASE harvester TO harvester;\""
-alembic upgrade head
