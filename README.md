@@ -1,4 +1,6 @@
-Test Harvester repository
+# Test Harvester Repository
+
+![Harvester Pipeline Flowchart](README_assets/Harvester_implementation.png?raw=true "Harvester Pipeline Flowchart")
 
 ## Setting Up a Development Environment.
 Running `docker-compose up --build -d --force-recreate` will stand up a docker container with supervised instances of the harvester mock pipeline and the gRPC server. For full functionality, a postgres database needs to be setup and provisioned following what is described in `postgres_init_gRPC_status.bash`. Additionally, a kafka broker needs to be instantiated with a topic named `Harvester`.

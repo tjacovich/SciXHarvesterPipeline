@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 
 from harvester.metadata.arxiv_harvester import arxiv_harvesting
-from harvester.s3_methods import s3_methods
+from harvester.s3_methods import load_s3
 
 from harvester import db, utils
 
@@ -44,7 +44,7 @@ class Harvester_APP:
         self.logger = None
         self.schema_client = None
         self._init_logger()
-        self.s3Client = s3_methods(boto3.client('s3'))
+        self.s3Clients = load_s3(self.config).s3Clients
         self.Session = sessionmaker(self.engine)
         self.redis = redis.StrictRedis(self.config.get('REDIS_HOST', 'localhost'), self.config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
     
