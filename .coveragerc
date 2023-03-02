@@ -1,0 +1,3 @@
+[run]
+source = harvester
+omit = harvester/tests*
