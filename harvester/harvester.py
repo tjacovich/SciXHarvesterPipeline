@@ -44,7 +44,7 @@ class Harvester_APP:
         self.logger = None
         self.schema_client = None
         self._init_logger()
-        self.s3Clients = load_s3
+        self.s3Clients = load_s3(self.config).s3Clients
         self.Session = sessionmaker(self.engine)
         self.redis = redis.StrictRedis(self.config.get('REDIS_HOST', 'localhost'), self.config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
     

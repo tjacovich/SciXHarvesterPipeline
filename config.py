@@ -12,18 +12,17 @@ REDIS_PORT = 6379
 KAFKA_BROKER = 'kafka:9092'
 SCHEMA_REGISTRY_URL = 'http://schema-registry:8081'
 #Harvester AVRO Schema Parameters
-SCHEMA_ID = '1'
 HARVESTER_INPUT_SCHEMA= 'HarvesterInputSchema'
 HARVESTER_INPUT_TOPIC = 'HarvesterInput'
 HARVESTER_OUTPUT_SCHEMA = 'HarvesterOutputSchema'
 HARVESTER_OUTPUT_TOPIC = 'HarvesterOutput'
+#S3 Configuration
+S3_PROVIDERS=['AWS']
 #AWS Configuration
 AWS_ACCESS_KEY_ID = 'CHANGEME'
 AWS_SECRET_ACCESS_KEY = 'SECRETS'
 AWS_DEFAULT_REGION = 'us-east-1'
 PROFILE_NAME = 'SESSION_PROFILE'
-S3_PROVIDER_LIST={'AWS'}
-#AWS Bucket Parameters
 AWS_BUCKET_NAME = 'BUCKETNAME'
 AWS_BUCKET_ARN = 'BUCKETARN'
 #OAI Harvesting urls

@@ -33,7 +33,8 @@ def arxiv_harvesting(app, job_request, producer):
         #Generate filepath for S3
         file_path = "/{}/{}".format(datestamp, record_id)
         #write record to S3
-        etag = app.s3Client.write_object_s3(file_bytes=bytes(record, 'utf-8'), bucket=app.config.get('BUCKET_NAME'), object_name=file_path)
+        for provider in app.s3Clients.keys():
+            etag = app.s3Clients[provider].write_object_s3(file_bytes=bytes(record, 'utf-8'), object_name=file_path)
 
         if etag:
             app.logger.debug("AWS etag for {} is: {}".format(record_id, etag))
