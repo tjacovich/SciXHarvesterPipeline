@@ -11,14 +11,6 @@ class s3_methods:
             logging.error(e)
             raise e
         return response.e_tag
-    
-    def get_object_s3(self, object_name):
-        try:
-            response = self.bucket.get_object(Key=object_name)
-        except ClientError as e:
-            logging.error(e)
-            raise e
-        return response
 
 class s3_provider(s3_methods):
     def __init__(self, provider, config):
@@ -27,7 +19,7 @@ class s3_provider(s3_methods):
             self.bucket = self.s3.Bucket(config.get('AWS_BUCKET_NAME'))
         else:
             self.s3 = boto3.resource('s3', 
-                            endpoint_url='https://<minio>:9000',
+                            endpoint_url=config.get(str(provider)+'_S3_URL'),
                             aws_access_key_id=config.get(str(provider)+'_ACCESS_KEY_ID'),
                             aws_secret_access_key=config.get(str(provider)+'_SECRET_ACCESS_KEY'),
                             aws_session_token=None,
