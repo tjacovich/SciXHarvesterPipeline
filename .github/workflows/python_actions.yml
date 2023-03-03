@@ -42,8 +42,8 @@ jobs:
       run: |
         pip install -U -r requirements.txt
         pip install -U -r dev-requirements.txt
-        git submodule update --init --recursive
-        pip install -U -r harvester_gRPC/requirements.txt
+#        git submodule update --init --recursive
+#        pip install -U -r harvester_gRPC/requirements.txt
     - name: Test with pytest
       run: |
         py.test
