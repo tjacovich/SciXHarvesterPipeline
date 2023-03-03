@@ -45,7 +45,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        py.test
+        python -m pytest tests/
 
     - uses: actions/upload-artifact@v2
       with:
