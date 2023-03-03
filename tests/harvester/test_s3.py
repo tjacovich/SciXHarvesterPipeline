@@ -3,9 +3,7 @@ import moto
 import pytest
 import os
 from unittest.mock import patch
-from botocore.exceptions import ClientError, ParamValidationError
-
-
+from botocore.exceptions import ParamValidationError
 from harvester.s3_methods import load_s3
 
 @pytest.fixture

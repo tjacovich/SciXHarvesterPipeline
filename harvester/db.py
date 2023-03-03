@@ -113,14 +113,3 @@ def get_harvester_record(cls, record_ids):
             record_db = session.query(models.Harvester_record).filter(models.Harvester_record.record_id == record_id).first()    
     return record_db
 
-def _get_harvester_record_by_id(session, record_id, only_status = None):
-    """
-    Return all updates with job_hash
-    """
-    status = None
-    logger.info("Opening Session")
-    record_db = session.query(models.Harvester_record).filter(models.Harvester_record.record_id == record_id).first() 
-    if record_db:
-        logger.info("Found record: {}".format(record_db.record_id))
-    return record_db
-

@@ -1,3 +1,4 @@
 [run]
 source = harvester
-omit = harvester/tests*
+omit =  *__init__* 
+        *config*
