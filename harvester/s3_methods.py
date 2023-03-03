@@ -1,5 +1,5 @@
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ParamValidationError
 import logging
 
 class s3_methods:
@@ -7,7 +7,7 @@ class s3_methods:
         try:
             response = self.bucket.put_object(Body=file_bytes, Key=object_name)
             logging.info(response)
-        except ClientError as e:
+        except (ClientError, ParamValidationError) as e:
             logging.error(e)
             raise e
         return response.e_tag
