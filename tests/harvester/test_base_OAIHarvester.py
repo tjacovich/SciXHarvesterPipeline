@@ -14,7 +14,7 @@ class test_OAI_harvesting(TestCase):
 
     def test_OAI_ListRecords(self):
         with MockListRecords():
-            list_records = OAI.ListRecords(url='https://export.arxiv.org/oai2', params={'from':'2023-03-07', 'metadataPrefix': 'oai_dc'})
+            list_records = OAI.ListRecords(url='https://export.arxiv.org/oai2', params={'metadataPrefix': 'oai_dc', 'from':'2023-03-07'})
             with open('tests/data/ListRecords_data_0.xml', 'r+') as f:
                 response_text = f.read()            
             self.assertEqual(list_records.text, response_text)

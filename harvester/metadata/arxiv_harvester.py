@@ -96,7 +96,6 @@ class ArXiV_Harvester(OAI):
                 raw_response = self.ListRecords(self.url, self.params)
                 self.raw_xml = raw_response.text
                 success = True
-            except  Exception as e:
                 """
                 Still need to write the code that extracts the retry-after time from the response.
                 """
@@ -107,6 +106,9 @@ class ArXiV_Harvester(OAI):
                 else:
                     logger.exception("Failed to Harvest ArXiV records for daterange: {}".format(self.daterange))
                     raise e
+            except Exception as e:
+                logger.exception("Failed to Harvest ArXiV records for daterange: {}".format(self.daterange))
+     
             arxivparser = arxiv.MultiArxivParser()
             return arxivparser.parse(self.raw_xml)
 

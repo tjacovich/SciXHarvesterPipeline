@@ -32,7 +32,7 @@ class MockListRecords(requests_mock.MockerCore):
         requests_mock.MockerCore.__init__(self)
         self.kwargs = kwargs
         self.url='https://export.arxiv.org/oai2'
-        self.possible_params = ['?metadataPrefix=oai_dc&verb=ListRecords&from=2023-03-07', '?verb=ListRecords&resumptionToken=6511260%7C1001', '?verb=ListRecords&resumptionToken=6511260%7C2001']
+        self.possible_params = ['?metadataPrefix=oai_dc&from=2023-03-07&verb=ListRecords', '?verb=ListRecords&resumptionToken=6511260%7C1001', '?verb=ListRecords&resumptionToken=6511260%7C2001']
 
         for i in range(0, len(self.possible_params)):
             self.register_uri('GET', self.url+str(self.possible_params[i]), text=self.callback(i))
