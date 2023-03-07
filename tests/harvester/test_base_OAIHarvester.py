@@ -1,8 +1,6 @@
 from harvester.base.OAIHarvester import OAIHarvester as OAI
 from tests.harvester.base import MockGetRecord, MockListRecords, MockListIdentifiers
 from unittest import TestCase
-import json
-import pudb
 
 class test_OAI_harvesting(TestCase):
     def test_OAI_GetRecord(self):
