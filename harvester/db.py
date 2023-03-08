@@ -86,7 +86,7 @@ def update_job_status(cls, job_hash, status = None):
             updated = True
     return updated
 
-def write_harvester_record(cls, record_id, date, s3_key, etag, source):
+def write_harvester_record(cls, record_id, date, s3_key, checksum, source):
     """
     Write harvested record to db. 
     """
@@ -96,7 +96,7 @@ def write_harvester_record(cls, record_id, date, s3_key, etag, source):
         harvester_record.record_id = record_id
         harvester_record.s3_key = s3_key
         harvester_record.date = date
-        harvester_record.etag = etag
+        harvester_record.checksum = checksum
         harvester_record.source = source
         session.add(harvester_record)
         session.commit()

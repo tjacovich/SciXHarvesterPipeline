@@ -8,7 +8,7 @@ class s3_methods:
             response = self.bucket.put_object(Body=file_bytes, Key=object_name)
             logging.info(response)
         except (ClientError, ParamValidationError) as e:
-            logging.error(e)
+            logging.exception(e)
             raise e
         return response.e_tag
 
@@ -25,8 +25,6 @@ class s3_provider(s3_methods):
                             aws_session_token=None,
                         )
             self.bucket = self.s3.Bucket(config.get(str(provider)+'_BUCKET_NAME'))
-
-
 
 class load_s3:
     def __init__(self, config):

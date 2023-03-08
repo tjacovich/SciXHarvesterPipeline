@@ -35,17 +35,17 @@ def arxiv_harvesting(app, job_request, producer):
         file_path = "/{}/{}".format(datestamp, record_id)
         #write record to S3
         for provider in app.s3Clients.keys():
-            etag = app.s3Clients[provider].write_object_s3(file_bytes=bytes(record, 'utf-8'), object_name=file_path)
+            checksum = app.s3Clients[provider].write_object_s3(file_bytes=bytes(record, 'utf-8'), object_name=file_path)
 
-        if etag:
-            app.logger.debug("AWS etag for {} is: {}".format(record_id, etag))
+        if checksum:
+            app.logger.debug("AWS checksum for {} is: {}".format(record_id, checksum))
             s3_key = file_path
-            produce = db.write_harvester_record(app, record_id, datetime.now(), s3_key, str(etag), job_request.get("task"))
+            produce = db.write_harvester_record(app, record_id, datetime.now(), s3_key, str(checksum), job_request.get("task"))
             if produce:
                 producer_message = {"record_id": str(record_id), "record_xml": record, "task": job_request.get("task")}
                 producer.produce(topic=app.config.get('HARVESTER_OUTPUT_TOPIC'), value=producer_message, value_schema=harvester_output_schema)
         else:
-            app.logger.error("No etag generated, AWS upload must have failed. Stopping.")
+            app.logger.error("No checksum generated, AWS upload must have failed. Stopping.")
             return "Error"
 
     return "Success"
