@@ -29,6 +29,14 @@ class test_OAI_harvesting(TestCase):
             with pytest.raises(requests_mock.exceptions.NoMockAddress):
                 list_records = OAI.ListRecords(url='https://export.arxiv.org/oai2', params={'resumptionToken':'6511260|3001'})
 
+    def test_OAI_ListRecords_503(self):
+        with MockListRecords(error_503=True):
+            list_records = OAI.ListRecords(url='https://export.arxiv.org/oai2', params={'metadataPrefix': 'oai_dc', 'from':'2023-03-07'})
+            with open('tests/data/arxiv_retry_after.html', 'r+') as f:
+                response_text = f.read()            
+            self.assertEqual(list_records.text, response_text)
+            self.assertEqual(list_records.status_code, 503)
+   
     def test_OAI_ListIdentifiers(self):
         with MockListIdentifiers():
             list_identifiers = OAI.ListIdentifiers(url='https://export.arxiv.org/oai2', params={'from':'2023-03-07', 'metadataPrefix': 'oai_dc'})

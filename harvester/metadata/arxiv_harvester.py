@@ -6,6 +6,7 @@ from harvester import db
 from adsingestp.parsers import arxiv
 import re
 import uuid
+import requests
 from datetime import datetime
 
 MAX_RETRIES = 5
@@ -77,40 +78,47 @@ class ArXiV_Harvester(OAI):
         success = False
         retries = 0
 
-        while success != True:
-            """
-            This loop:
-            1. Sends the relevant request to the ArXiV API
-            2. Checks to make sure we aren't receiving any flow control responses.
-            3. If we are it waits the specified amount of time before proceeding. 
-            4. If we repeatedly hit 503 or any other error, we stop.
-            """
-            if not resumptionToken:
-                self.params['from'] = self.daterange
-            
-            else:
-                #specifying any other query params besides the verb with the resumptionToken will result in an error.
-                self.params = {'resumptionToken': resumptionToken}
-
-            try:
-                raw_response = self.ListRecords(self.url, self.params)
-                self.raw_xml = raw_response.text
-                success = True
+        try:
+            while success != True:
                 """
-                Still need to write the code that extracts the retry-after time from the response.
+                This loop:
+                1. Sends the relevant request to the ArXiV API
+                2. Checks to make sure we aren't receiving any flow control responses.
+                3. If we are it waits the specified amount of time before proceeding. 
+                4. If we repeatedly hit 503 or any other error, we stop.
                 """
-                if raw_response.status_code == 503  and retries < MAX_RETRIES:
-                    retries += 1 
-                    sleep_time = 1
-                    time.sleep(sleep_time)
+                if not resumptionToken:
+                    self.params['from'] = self.daterange
+                
                 else:
-                    logger.exception("Failed to Harvest ArXiV records for daterange: {}".format(self.daterange))
+                    #specifying any other query params besides the verb with the resumptionToken will result in an error.
+                    self.params = {'resumptionToken': resumptionToken}
+
+                try:
+                    raw_response = self.ListRecords(self.url, self.params)
+                    self.raw_xml = raw_response.text
+                    """
+                    Still need to write the code that extracts the retry-after time from the response.
+                    """
+                    if not raw_response.ok:
+                        if raw_response.status_code == 503  and retries < MAX_RETRIES:
+                            retries += 1 
+                            search = re.compile(r'\<h1\>Retry after ([0-9]) seconds\</h1\>')
+                            sleep_time = int(search.search(raw_response.text)[1])
+                            time.sleep(sleep_time)
+                        else:
+                            logger.error("Failed to Harvest ArXiV records for daterange: {}".format(self.daterange))
+                            raise requests.exceptions.Timeout
+                    else:
+                        success = True
+
+                except Exception as e:
                     raise e
-            except Exception as e:
-                logger.exception("Failed to Harvest ArXiV records for daterange: {}".format(self.daterange))
+        except Exception as e:
+            raise e
      
-            arxivparser = arxiv.MultiArxivParser()
-            return arxivparser.parse(self.raw_xml)
+        arxivparser = arxiv.MultiArxivParser()
+        return arxivparser.parse(self.raw_xml)
 
     def __iter__(self):
         """
