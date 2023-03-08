@@ -23,7 +23,7 @@ if __name__ == "__main__":
         consumer.subscribe([app.config.get('HARVESTER_INPUT_TOPIC', 'Harvester')])
         producer = AvroProducer({'bootstrap.servers': app.config.get("KAFKA_BROKER"), 'schema.registry.url': app.config.get("SCHEMA_REGISTRY_URL")})
         app.logger.info("Starting Harvester APP")
-        app.Harvester_task(consumer, producer)
+        app.harvester_consumer(consumer, producer)
     
     elif args.action == 'HARVESTER_API':
         asyncio.run(serve())

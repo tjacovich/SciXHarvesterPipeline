@@ -25,6 +25,10 @@ class base_utils(TestCase):
         for mock_name, mock_patch in mock_patches.items():
             mock_patch.stop()
 
+class mock_job_request(object):
+    def value(self):
+        return {"hash":"g425897fh3qp35890u54256342ewferht242546", "task_args":{"ingest_type":"metadata", "daterange":"2023-03-07", "resumptionToken": None}, "task": "ARXIV"}
+
 
 class MockGetRecord(requests_mock.MockerCore):
     """

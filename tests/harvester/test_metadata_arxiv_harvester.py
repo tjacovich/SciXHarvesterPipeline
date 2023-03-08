@@ -1,9 +1,9 @@
 from harvester.metadata.arxiv_harvester import ArXiV_Harvester, arxiv_harvesting
-from tests.harvester.base import MockListRecords
+from base import MockListRecords
 from harvester import utils, db
 from harvester.harvester import Harvester_APP
 from confluent_kafka.avro import AvroProducer
-from tests.harvester.mockschemaregistryclient import MockSchemaRegistryClient
+from mockschemaregistryclient import MockSchemaRegistryClient
 from unittest import TestCase
 import pickle
 import requests
