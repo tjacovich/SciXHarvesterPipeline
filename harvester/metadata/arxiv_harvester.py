@@ -1,5 +1,5 @@
 from harvester.base.OAIHarvester import OAIHarvester as OAI
-from harvester.utils import get_schema
+from harvester import utils
 import time
 import logging as logger
 from harvester import db
@@ -24,7 +24,7 @@ def arxiv_harvesting(app, job_request, producer):
     resumptionToken = job_request["task_args"].get("resumptionToken")
     daterange = job_request["task_args"].get("daterange")
     app.logger.info("{}, {}, {}".format(daterange, resumptionToken, datestamp))
-    harvester_output_schema = get_schema(app, app.schema_client, app.config.get('HARVESTER_OUTPUT_SCHEMA'))
+    harvester_output_schema = utils.get_schema(app, app.schema_client, app.config.get('HARVESTER_OUTPUT_SCHEMA'))
     
     harvester = ArXiV_Harvester(app.config.get("ARXIV_OAI_URL"), daterange=daterange, resumptionToken=resumptionToken)
 

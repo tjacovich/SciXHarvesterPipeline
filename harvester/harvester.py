@@ -38,7 +38,7 @@ class Harvester_APP:
         self.logger=logging.getLogger(__name__)
         self.logger.info("Starting Harvester Service Logging")
 
-    def __init__(self, proj_home, start_s3=False):
+    def __init__(self, proj_home):
         self.config = utils.load_config(proj_home)
         self.engine = create_engine(self.config.get('SQLALCHEMY_URL'))
         self.logger = None
