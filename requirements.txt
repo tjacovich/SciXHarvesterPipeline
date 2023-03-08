@@ -1,7 +1,8 @@
 confluent-kafka==1.9.2
-requests
-fastavro
-redis
+requests==2.27.1
+fastavro==1.7.2
+avro==1.11.1
+redis==4.4.0
 boto3==1.26.59
 adsingestp @ git+https://github.com/adsabs/ADSIngestParser.git@b1b18900e5c70b0c3f044443bed53b53c73942f4
 alembic == 1.8.1

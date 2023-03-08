@@ -3,7 +3,6 @@ from tests.harvester.base import MockListRecords
 from harvester import utils, db
 from harvester.harvester import Harvester_APP
 from confluent_kafka.avro import AvroProducer
-from confluent_kafka.schema_registry import SchemaRegistryClient
 from tests.harvester.mockschemaregistryclient import MockSchemaRegistryClient
 from unittest import TestCase
 import pickle
