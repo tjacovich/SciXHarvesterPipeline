@@ -4,6 +4,9 @@ import logging
 import json
 import json
 import redis
+from confluent_kafka.avro import AvroConsumer
+from confluent_kafka.avro import AvroProducer
+from confluent_kafka.schema_registry import SchemaRegistryClient
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +16,15 @@ import harvester.metadata.arxiv_harvester as arxiv_harvester
 from harvester.s3_methods import load_s3
 
 from harvester import db, utils
+def init_pipeline(proj_home):
+    app = Harvester_APP(proj_home)
+    app.schema_client = SchemaRegistryClient({'url': app.config.get("SCHEMA_REGISTRY_URL")})
+    schema = utils.get_schema(app, app.schema_client, app.config.get('HARVESTER_INPUT_SCHEMA'))
+    consumer = AvroConsumer({'bootstrap.servers': app.config.get("KAFKA_BROKER"), 'schema.registry.url': app.config.get("SCHEMA_REGISTRY_URL"), 'auto.offset.reset': 'latest', 'group.id': 'HarvesterPipeline1'}, reader_value_schema = schema)
+    consumer.subscribe([app.config.get('HARVESTER_INPUT_TOPIC', 'Harvester')])
+    producer = AvroProducer({'bootstrap.servers': app.config.get("KAFKA_BROKER"), 'schema.registry.url': app.config.get("SCHEMA_REGISTRY_URL")})
+    app.logger.info("Starting Harvester APP")
+    app.harvester_consumer(consumer, producer)
 
 class Harvester_APP:
     @contextmanager
