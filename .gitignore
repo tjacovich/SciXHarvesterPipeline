@@ -6,3 +6,4 @@ local_config.py
 cache/
 data/
 aws_env_vars.env
+kubernetes/
