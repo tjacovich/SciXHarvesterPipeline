@@ -40,5 +40,5 @@ class Harvester_record(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     s3_key = Column(String)
     date = Column(DateTime)
-    etag = Column(String)
+    checksum = Column(String)
     source = Column(Enum(Source))

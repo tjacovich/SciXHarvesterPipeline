@@ -23,7 +23,7 @@ def upgrade() -> None:
     sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False),
     sa.Column('s3_key', sa.String(), nullable=True),
     sa.Column('date', sa.DateTime(), nullable=True),
-    sa.Column('etag', sa.String(), nullable=True),
+    sa.Column('checksum', sa.String(), nullable=True),
     sa.Column('source', sa.Enum('ARXIV', 'APS', 'AAS', 'MNRAS', 'PNAAS', name='source'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )

@@ -86,7 +86,7 @@ def update_job_status(cls, job_hash, status = None):
             updated = True
     return updated
 
-def write_harvester_record(cls, record_id, date, s3_key, etag, source):
+def write_harvester_record(cls, record_id, date, s3_key, checksum, source):
     """
     Write harvested record to db. 
     """
@@ -96,7 +96,7 @@ def write_harvester_record(cls, record_id, date, s3_key, etag, source):
         harvester_record.record_id = record_id
         harvester_record.s3_key = s3_key
         harvester_record.date = date
-        harvester_record.etag = etag
+        harvester_record.checksum = checksum
         harvester_record.source = source
         session.add(harvester_record)
         session.commit()
@@ -111,16 +111,5 @@ def get_harvester_record(cls, record_ids):
         logger.info("Opening Session")
         for record_id in record_ids:
             record_db = session.query(models.Harvester_record).filter(models.Harvester_record.record_id == record_id).first()    
-    return record_db
-
-def _get_harvester_record_by_id(session, record_id, only_status = None):
-    """
-    Return all updates with job_hash
-    """
-    status = None
-    logger.info("Opening Session")
-    record_db = session.query(models.Harvester_record).filter(models.Harvester_record.record_id == record_id).first() 
-    if record_db:
-        logger.info("Found record: {}".format(record_db.record_id))
     return record_db
 
