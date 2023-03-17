@@ -16,21 +16,13 @@
 import asyncio
 import logging
 import argparse
-import sys
-from pathlib import Path
 
 import grpc
 import grpc_modules.harvester_grpc as harvester_grpc
 from avro_serializer import AvroSerialHelper
-import avro
 import json
 from confluent_kafka.schema_registry import SchemaRegistryClient
 
-HERE = Path(__file__).parent
-
-sys.path.append(str(HERE / '../../harvester'))
-
-#from harvester.utils import get_schema
 def get_schema(app, schema_client, schema_name):          
     try:
         avro_schema = schema_client.get_latest_version(schema_name)
@@ -40,7 +32,7 @@ def get_schema(app, schema_client, schema_name):
         app.logger.warning("Could not retrieve avro schema with exception: {}".format(e))
 
     return avro_schema.schema.schema_str
-schema1 = avro.schema.parse(open("AVRO_schemas/HarvesterInputSchema.avsc", "rb").read())
+
 schema_client =  SchemaRegistryClient({'url': 'http://localhost:8081'})
 
 class Logging:

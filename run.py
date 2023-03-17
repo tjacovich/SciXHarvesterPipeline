@@ -2,7 +2,7 @@ from confluent_kafka.avro import AvroConsumer
 from confluent_kafka.avro import AvroProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from harvester import harvester, utils
-from harvester_gRPC.gRPCHarvester.harvester_server import serve
+from API.harvester_server import serve
 import asyncio
 import os
 import argparse

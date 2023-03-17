@@ -20,8 +20,7 @@ class AvroSerialHelper:
 
         except avro.errors.AvroTypeException as e:
             print("Failed to serialize request with error: {} \nStopping.".format(e))
-            sys.exit()
-            
+            sys.exit()    
     
     def avro_deserializer(self, raw_bytes):
         if self.logger: self.logger.debug(raw_bytes)

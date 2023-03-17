@@ -32,7 +32,7 @@ import sys
 import redis
 
 HERE = Path(__file__).parent
-proj_home = str(HERE / '../../')
+proj_home = str(HERE / '..')
 sys.path.append(proj_home)
 
 from harvester import utils, db
