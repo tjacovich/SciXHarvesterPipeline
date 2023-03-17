@@ -4,4 +4,5 @@ __pycache__
 logs/
 local_config.py
 cache/
+data/
 aws_env_vars.env

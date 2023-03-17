@@ -102,8 +102,9 @@ class ArXiV_Harvester(OAI):
                     """
                     if not raw_response.ok:
                         if raw_response.status_code == 503  and retries < MAX_RETRIES:
+                            logger.info(raw_response.text)
                             retries += 1 
-                            search = re.compile(r'\<h1\>Retry after ([0-9]) seconds\</h1\>')
+                            search = re.compile(r'\<h1\>Retry after ([0-9]+) seconds\</h1\>')
                             sleep_time = int(search.search(raw_response.text)[1])
                             time.sleep(sleep_time)
                         else:
