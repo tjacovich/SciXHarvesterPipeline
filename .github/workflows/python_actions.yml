@@ -46,7 +46,7 @@ jobs:
 #        pip install -U -r harvester_gRPC/requirements.txt
     - name: Test with pytest
       run: |
-        py.test test/harvester
+        py.test tests/harvester
 
     - uses: actions/upload-artifact@v2
       with:
