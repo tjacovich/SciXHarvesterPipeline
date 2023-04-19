@@ -70,7 +70,8 @@ class test_ArXiV_Harvester(TestCase):
                 bucket = 'test-bucket-name'
                 conn = boto3.resource("s3")
                 conn.create_bucket(Bucket=bucket)
-            arxiv_harvesting(mock_app, mock_job_request, producer)
+            with MockListRecords():
+                arxiv_harvesting(mock_app, mock_job_request, producer)
             self.assertTrue(mocked['get_schema'].called)
             self.assertTrue(mocked['write_harvester_record'].called)
 

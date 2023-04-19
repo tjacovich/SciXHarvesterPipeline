@@ -1,4 +1,0 @@
-[submodule "harvester_gRPC"]
-	path = harvester_gRPC
-	url = git@github.com:tjacovich/harvester_gRPC.git
-	branch = main 
