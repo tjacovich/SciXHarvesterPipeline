@@ -1,7 +1,7 @@
 [project]
 name = "SciXHarvester"
 version = "0.0.1"
-description = "The primary harvester unit for the new Nasa Science Explorer backoffice architecture"
+description = "The primary harvester unit for the new NASA Science Explorer (NASA SciX) backoffice architecture"
 authors = [{ name = "Taylor Jacovich", email = "tjacovich@cfa.harvard.edu"}]
 license = { text = "MIT" }
 readme = "README.md"
@@ -14,9 +14,9 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
 ]
 
-#packages = [
-#    "SciXHarvester",
-#]
+packages = [
+    "SciXHarvester",
+]
 
 dependencies = [
     'confluent-kafka==1.9.2',
@@ -44,7 +44,7 @@ dev = [
     'black==22.3.0',
     'flake8==4.0.1',
     'isort==5.10.1',
-    'pytest==6.2.5',
+    'pytest==7.3.1',
     'pyupgrade==2.29.1',
     'pytest-mock==3.6.1',
     'pre-commit==2.16.0',
@@ -66,7 +66,7 @@ testpaths = [
     "SciXHarvester/tests",
 ]
 pythonpath = [
-    "SciXHarvester",
+    "SciXHarvester/",
 ]
 
 [tool.coverage.run]
