@@ -8,7 +8,7 @@ Running `docker-compose up --build -d --force-recreate` will stand up a docker c
 
 ## Sending commands to the gRPC API
 
-Currently, there are two methods that have been defined in the API for interacting with the Harvester Pipeline. 
+Currently, there are two methods that have been defined in the API for interacting with the Harvester Pipeline.
 - `HARVESTER_INIT`: Initialize a job with given `job_args` passed into the script as a JSON.
 - `HARVESTER_MONITOR`: Queries the status of a job with a given `<job_id>`
 
