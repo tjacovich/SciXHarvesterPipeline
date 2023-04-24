@@ -28,3 +28,8 @@ python3 API/harvester_client.py HARVESTER_INIT --task "ARXIV" --task_args '{"har
 #This command asks the server to check on the current status of a job with <job_id>
 python3 API/harvester_client.py HARVESTER_MONITOR --job_id '<job_id>'
 ```
+
+
+## Maintainers
+
+Taylor Jacovich
