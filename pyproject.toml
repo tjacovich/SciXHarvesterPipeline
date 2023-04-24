@@ -3,7 +3,7 @@ name = "SciXHarvester"
 version = "0.0.1"
 description = "The primary harvester unit for the new NASA Science Explorer (NASA SciX) backoffice architecture"
 authors = [{ name = "Taylor Jacovich", email = "tjacovich@cfa.harvard.edu"}]
-license = { text = "MIT" }
+license = { text = "GPL-3.0" }
 readme = "README.md"
 #repository = "https://github.com/tjacovich/SciXHarvesterPipeline"
 classifiers = [
