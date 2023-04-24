@@ -1,31 +1,34 @@
-import harvester.models as models
 import datetime
-import logging as logger
 import json
+import logging as logger
+
+import harvester.models as models
 
 logger.basicConfig(level=logger.DEBUG)
 
+
 def write_status_redis(redis_instance, status):
     logger.debug("Publishing status: {}".format(status))
-    redis_instance.publish('harvester_statuses', status)
-    
+    redis_instance.publish("harvester_statuses", status)
+
+
 def get_status_redis(subscription, job_id):
     status = None
     logger.debug("DB: Listening for harvester status updates")
     while not status:
         for message in subscription.listen():
-            logger.debug("DB: Message from redis: {}".format(message))    
+            logger.debug("DB: Message from redis: {}".format(message))
             if message is not None and isinstance(message, dict):
-                if message.get('data') != 1:
-                    logger.debug("DB: data: {}".format(message.get('data')))
-                    status_dict = json.loads(message.get('data'))
-                    if status_dict['job_id'] == job_id:
-                        status = status_dict['status']
+                if message.get("data") != 1:
+                    logger.debug("DB: data: {}".format(message.get("data")))
+                    status_dict = json.loads(message.get("data"))
+                    if status_dict["job_id"] == job_id:
+                        status = status_dict["status"]
                         logger.debug("DB: status: {}".format(status))
                         return status
 
 
-def get_job_status_by_job_hash(cls, job_hashes, only_status = None):
+def get_job_status_by_job_hash(cls, job_hashes, only_status=None):
     """
     Return all updates with job_hash
     """
@@ -34,30 +37,50 @@ def get_job_status_by_job_hash(cls, job_hashes, only_status = None):
         logger.info("Opening Session")
         for job_hash in job_hashes:
             if only_status:
-                record_db = session.query(models.gRPC_status).filter(models.gRPC_status.job_hash == job_hash).filter_by(status=only_status).first()
+                record_db = (
+                    session.query(models.gRPC_status)
+                    .filter(models.gRPC_status.job_hash == job_hash)
+                    .filter_by(status=only_status)
+                    .first()
+                )
             else:
-                record_db = session.query(models.gRPC_status).filter(models.gRPC_status.job_hash == job_hash).first()
+                record_db = (
+                    session.query(models.gRPC_status)
+                    .filter(models.gRPC_status.job_hash == job_hash)
+                    .first()
+                )
             if record_db:
                 status = record_db.status
                 logger.info("{} has status: {}".format(record_db.job_hash, status))
-            
+
     return status
 
-def _get_job_by_job_hash(session, job_hash, only_status = None):
+
+def _get_job_by_job_hash(session, job_hash, only_status=None):
     """
     Return all updates with job_hash
     """
     logger.info("Opening Session")
 
     if only_status:
-        record_db = session.query(models.gRPC_status).filter(models.gRPC_status.job_hash == job_hash).filter_by(status=only_status).first()
+        record_db = (
+            session.query(models.gRPC_status)
+            .filter(models.gRPC_status.job_hash == job_hash)
+            .filter_by(status=only_status)
+            .first()
+        )
     else:
-        record_db = session.query(models.gRPC_status).filter(models.gRPC_status.job_hash == job_hash).first()
+        record_db = (
+            session.query(models.gRPC_status)
+            .filter(models.gRPC_status.job_hash == job_hash)
+            .first()
+        )
     if record_db:
         logger.info("Found record: {}".format(record_db.job_hash))
     return record_db
 
-def write_job_status(cls, job_request, only_status = None):
+
+def write_job_status(cls, job_request, only_status=None):
     """
     Return all updates with job_hash
     """
@@ -71,7 +94,8 @@ def write_job_status(cls, job_request, only_status = None):
         session.commit()
     return True
 
-def update_job_status(cls, job_hash, status = None):
+
+def update_job_status(cls, job_hash, status=None):
     """
     Return all updates with job_hash
     """
@@ -86,9 +110,10 @@ def update_job_status(cls, job_hash, status = None):
             updated = True
     return updated
 
+
 def write_harvester_record(cls, record_id, date, s3_key, checksum, source):
     """
-    Write harvested record to db. 
+    Write harvested record to db.
     """
     success = False
     with cls.session_scope() as session:
@@ -100,8 +125,9 @@ def write_harvester_record(cls, record_id, date, s3_key, checksum, source):
         harvester_record.source = source
         session.add(harvester_record)
         session.commit()
-        success = True  
+        success = True
     return success
+
 
 def get_harvester_record(cls, record_ids):
     """
@@ -110,6 +136,9 @@ def get_harvester_record(cls, record_ids):
     with cls.session_scope() as session:
         logger.info("Opening Session")
         for record_id in record_ids:
-            record_db = session.query(models.Harvester_record).filter(models.Harvester_record.record_id == record_id).first()    
+            record_db = (
+                session.query(models.Harvester_record)
+                .filter(models.Harvester_record.record_id == record_id)
+                .first()
+            )
     return record_db
-

@@ -1,12 +1,12 @@
-from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
-from alembic import context
-from logging.config import fileConfig
 import os
 import sys
+from logging.config import fileConfig
+
+from alembic import context
+from sqlalchemy import engine_from_config, pool
+
+import harvester.models as models
+from harvester.utils import load_config
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,15 +20,13 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-#target_metadata = None
-from harvester.utils import load_config
+# target_metadata = None
 
-opath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+opath = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 app_conf = load_config(proj_home=opath)
 
 if opath not in sys.path:
     sys.path.insert(0, opath)
-import harvester.models as models
 
 target_metadata = models.Base.metadata
 # this is the Alembic Config object, which provides
@@ -44,7 +42,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-#target_metadata = None
+# target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -75,9 +73,11 @@ def run_migrations_offline() -> None:
     with context.begin_transaction():
         context.run_migrations()
 
+
 def get_app_config(key):
-    print('Getting actual config for', key, app_conf.get(key, ""))
+    print("Getting actual config for", key, app_conf.get(key, ""))
     return app_conf.get(key)
+
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
@@ -87,17 +87,12 @@ def run_migrations_online() -> None:
 
     """
     cfg = config.get_section(config.config_ini_section)
-    cfg['sqlalchemy.url'] = get_app_config('SQLALCHEMY_URL')
+    cfg["sqlalchemy.url"] = get_app_config("SQLALCHEMY_URL")
 
-    connectable = engine_from_config(
-        cfg,
-        prefix='sqlalchemy.',
-        poolclass=pool.NullPool)
+    connectable = engine_from_config(cfg, prefix="sqlalchemy.", poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

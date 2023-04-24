@@ -13,48 +13,58 @@
 # limitations under the License.
 """The Python AsyncIO implementation of the GRPC Harvester server."""
 
+import hashlib
+import json
 import logging as logger
+import sys
+from contextlib import contextmanager
+from datetime import datetime
+from pathlib import Path
+from threading import Thread
 
 import grpc
-from API.grpc_modules.harvester_grpc import HarvesterInitServicer
-from API.grpc_modules.harvester_grpc import add_HarvesterInitServicer_to_server, add_HarvesterMonitorServicer_to_server
-
+import redis
 from confluent_kafka.avro import AvroProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
-from API.avro_serializer import AvroSerialHelper
-
-from datetime import datetime
-import hashlib
-from pathlib import Path
-import json
-import sys
-import redis
-
-HERE = Path(__file__).parent
-proj_home = str(HERE / '..')
-sys.path.append(proj_home)
-
-from harvester import utils, db
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from contextlib import contextmanager
-from threading import Thread
+
+from API.avro_serializer import AvroSerialHelper
+from API.grpc_modules.harvester_grpc import (
+    HarvesterInitServicer,
+    add_HarvesterInitServicer_to_server,
+    add_HarvesterMonitorServicer_to_server,
+)
+from harvester import db, utils
+
+HERE = Path(__file__).parent
+proj_home = str(HERE / "..")
+sys.path.append(proj_home)
 
 config = utils.load_config(proj_home=proj_home)
+
 
 class Logging:
     def __init__(self, logger):
         self.logger = logger
 
+
 NUMBER_OF_REPLY = 10
+
+
 class Listener(Thread):
     def __init__(self):
-        self.redis = redis.StrictRedis(config.get('REDIS_HOST', 'locahost'), config.get('REDIS_PORT', 6379), charset="utf-8", decode_responses=True) 
+        self.redis = redis.StrictRedis(
+            config.get("REDIS_HOST", "locahost"),
+            config.get("REDIS_PORT", 6379),
+            charset="utf-8",
+            decode_responses=True,
+        )
         self.subscription = self.redis.pubsub()
         self.end = False
 
-    def subscribe(self, channel_name='harvester_statuses'):    
+    def subscribe(self, channel_name="harvester_statuses"):
         self.subscription.subscribe(channel_name)
 
     def get_status_redis(self, job_id):
@@ -65,26 +75,28 @@ class Listener(Thread):
             if self.end:
                 logger.debug("Ending Listener thread")
                 return
-            logger.debug("DB: Message from redis: {}".format(message))    
+            logger.debug("DB: Message from redis: {}".format(message))
             if message is not None and isinstance(message, dict):
-                if message.get('data') != 1:
-                    logger.debug("DB: data: {}".format(message.get('data')))
-                    status_dict = json.loads(message.get('data'))
-                    if status_dict['job_id'] == job_id:
-                        status = status_dict['status']
+                if message.get("data") != 1:
+                    logger.debug("DB: data: {}".format(message.get("data")))
+                    status_dict = json.loads(message.get("data"))
+                    if status_dict["job_id"] == job_id:
+                        status = status_dict["status"]
                         logger.debug("DB: status: {}".format(status))
                         yield status
-    
-class Harvester(HarvesterInitServicer):
 
+
+class Harvester(HarvesterInitServicer):
     def __init__(self, producer, schema, schema_client):
-        self.topic = config.get('HARVESTER_INPUT_TOPIC')
+        self.topic = config.get("HARVESTER_INPUT_TOPIC")
         self.timestamp = datetime.now().timestamp()
         self.producer = producer
         self.schema = schema
         self.schema_client = schema_client
-        self.serializer = AvroSerializer(schema_registry_client=self.schema_client, schema_str = self.schema)
-        self.engine = create_engine(config.get('SQLALCHEMY_URL'))
+        self.serializer = AvroSerializer(
+            schema_registry_client=self.schema_client, schema_str=self.schema
+        )
+        self.engine = create_engine(config.get("SQLALCHEMY_URL"))
         self.Session = sessionmaker(self.engine)
 
     @contextmanager
@@ -94,37 +106,38 @@ class Harvester(HarvesterInitServicer):
         try:
             yield session
             session.commit()
-        except:
+        except Exception:
             session.rollback()
             raise
         finally:
             session.close()
 
-    def initHarvester(self, request,
-                       context: grpc.aio.ServicerContext):
+    def initHarvester(self, request, context: grpc.aio.ServicerContext):
         logger.info("Serving initHarvester request %s", request)
         tstamp = datetime.now().timestamp()
         print(request)
-        logger.info(json.dumps(request.get('task_args')))
-        logger.info("Sending {} to Harvester Topic".format(b' %s.' % json.dumps(request.get('task_args')).encode('utf-8')))
-        hash = hashlib.sha256(bytes(str(request)+str(tstamp), 'utf-8')).hexdigest()
-        bhash = bytes(str(hash), 'utf-8')
+        logger.info(json.dumps(request.get("task_args")))
+        logger.info(
+            "Sending {} to Harvester Topic".format(
+                b" %s." % json.dumps(request.get("task_args")).encode("utf-8")
+            )
+        )
+        hash = hashlib.sha256(bytes(str(request) + str(tstamp), "utf-8")).hexdigest()
         logger.info("{}".format(hash))
-        
-        job_request = request
-        persistence = job_request['task_args'].get('persistence', False)
-        job_request['task_args'].pop('persistence')
-        job_request['hash'] = hash
 
+        job_request = request
+        persistence = job_request["task_args"].get("persistence", False)
+        job_request["task_args"].pop("persistence")
+        job_request["hash"] = hash
 
         logger.info(job_request)
 
-        job_request["status"] = 'Pending'
+        job_request["status"] = "Pending"
 
         self.producer.produce(topic=self.topic, value=job_request, value_schema=self.schema)
-                
+
         db.write_job_status(self, job_request)
-        
+
         if persistence:
             listener = Listener()
             listener.subscribe()
@@ -143,7 +156,7 @@ class Harvester(HarvesterInitServicer):
                     yield job_request
                     old_msg = msg
                     try:
-                        if  msg == "Error":
+                        if msg == "Error":
                             Done = True
                             logger.debug("Error = {}".format(Done))
                             listener.end = True
@@ -154,18 +167,18 @@ class Harvester(HarvesterInitServicer):
                             listener.end = True
                             break
 
-                    except:
+                    except Exception:
                         continue
                     try:
                         msg = next(listener.get_status_redis(hash))
                         logger.debug("HARVESTER: Redis returned: {} for job_id".format(msg))
-                    except:
+                    except Exception:
                         msg = ""
                         continue
-                
+
                 else:
                     try:
-                        msg =  next(listener.get_status_redis(hash))
+                        msg = next(listener.get_status_redis(hash))
                         logger.debug("HARVESTER: Redis published new status: {}".format(msg))
                     except Exception as e:
                         logger.error("failed to read message with error: {}.".format(e))
@@ -173,18 +186,16 @@ class Harvester(HarvesterInitServicer):
         else:
             yield job_request
 
-    
-    def monitorHarvester(self, request,
-                       context: grpc.aio.ServicerContext):
+    def monitorHarvester(self, request, context: grpc.aio.ServicerContext):
         logger.info("%s", request)
-        logger.info(json.dumps(request.get('task_args')))
-                
-        job_request = request
-        persistence = job_request['task_args'].get('persistence', False)
+        logger.info(json.dumps(request.get("task_args")))
 
-        hash = request.get('hash')
-        
-        if hash: 
+        job_request = request
+        persistence = job_request["task_args"].get("persistence", False)
+
+        hash = request.get("hash")
+
+        if hash:
             msg = db.get_job_status_by_job_hash(self, [str(hash)]).name
             if persistence:
                 logger.info("User requested persitent connection.")
@@ -197,7 +208,7 @@ class Harvester(HarvesterInitServicer):
                         yield job_request
                         old_msg = msg
                         try:
-                            if  msg == "Error":
+                            if msg == "Error":
                                 Done = True
                                 logger.debug("Error = {}".format(Done))
                                 break
@@ -206,18 +217,18 @@ class Harvester(HarvesterInitServicer):
                                 logger.debug("Done = {}".format(Done))
                                 break
 
-                        except:
+                        except Exception:
                             continue
                         try:
                             msg = next(self.listener.get_status_redis(hash))
                             logger.debug("{}".format(msg))
-                        except:
+                        except Exception:
                             msg = ""
                             continue
-            
+
                     else:
                         try:
-                            msg =  next(self.listener.get_status_redis(hash))
+                            msg = next(self.listener.get_status_redis(hash))
                             logger.debug("Redis published new status")
                         except Exception as e:
                             logger.error("failed to read message with error: {}.".format(e))
@@ -234,17 +245,25 @@ class Harvester(HarvesterInitServicer):
 async def serve() -> None:
     server = grpc.aio.server()
     app_log = Logging(logger)
-    schema_client =  SchemaRegistryClient({'url': config.get("SCHEMA_REGISTRY_URL")})
-    schema = utils.get_schema(app_log, schema_client, config.get('HARVESTER_INPUT_SCHEMA'))
+    schema_client = SchemaRegistryClient({"url": config.get("SCHEMA_REGISTRY_URL")})
+    schema = utils.get_schema(app_log, schema_client, config.get("HARVESTER_INPUT_SCHEMA"))
     avroserialhelper = AvroSerialHelper(schema, app_log.logger)
-    producer = AvroProducer({'schema.registry.url': config.get("SCHEMA_REGISTRY_URL"),'bootstrap.servers': config.get("KAFKA_BROKER")})
+    producer = AvroProducer(
+        {
+            "schema.registry.url": config.get("SCHEMA_REGISTRY_URL"),
+            "bootstrap.servers": config.get("KAFKA_BROKER"),
+        }
+    )
 
-    add_HarvesterInitServicer_to_server(Harvester(producer, schema, schema_client), server, avroserialhelper)
-    add_HarvesterMonitorServicer_to_server(Harvester(producer, schema, schema_client), server, avroserialhelper)
-    listen_addr = "[::]:"+str(config.get("GRPC_PORT", 50051))
+    add_HarvesterInitServicer_to_server(
+        Harvester(producer, schema, schema_client), server, avroserialhelper
+    )
+    add_HarvesterMonitorServicer_to_server(
+        Harvester(producer, schema, schema_client), server, avroserialhelper
+    )
+    listen_addr = "[::]:" + str(config.get("GRPC_PORT", 50051))
     server.add_insecure_port(listen_addr)
 
     app_log.logger.info("Starting server on %s", listen_addr)
     await server.start()
     await server.wait_for_termination()
-
