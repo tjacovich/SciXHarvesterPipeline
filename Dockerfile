@@ -13,15 +13,11 @@ COPY SciXHarvester /app/SciXHarvester
 COPY README.md /app/README.md 
 COPY pyproject.toml /app
 RUN pip install .
-#RUN pip install --no-cache-dir -U -r requirements.txt
 
-#COPY dev-requirements.txt /app
-#RUN pip install --no-cache-dir -U -r dev-requirements.txt
+COPY scripts/entrypoint.sh /app/entrypoint.sh
+COPY scripts/migrate_db.py /app/migrate_db.py
 
-COPY SciXHarvester/scripts/entrypoint.sh /app/entrypoint.sh
-COPY SciXHarvester/scripts/migrate_db.py /app/migrate_db.py
-
-COPY SciXHarvester/scripts/sv/ /etc/sv/
+COPY scripts/sv/ /etc/sv/
 RUN ln -s /etc/sv/APP /etc/service/
 RUN ln -s /etc/sv/API /etc/service/
 
@@ -30,4 +26,4 @@ RUN useradd -ms /bin/bash ads
 
 WORKDIR /app/SciXHarvester
 
-ENTRYPOINT [ "/app/SciXharvester/scripts/entrypoint.sh" ]
+ENTRYPOINT [ "/app/scripts/entrypoint.sh" ]
