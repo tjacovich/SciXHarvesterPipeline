@@ -1,0 +1,3 @@
+#!/bin/bash -e
+exec 2>&1
+exec chpst -u ads bash -c 'cd /app/SciXHarvester && python3 run.py HARVESTER_API'

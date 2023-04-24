@@ -60,7 +60,7 @@ services:
     volumes:
       # Note that /docker-entrypoint-initdb.d will contain init-db-once.sql which initializes the DB only once
       # and sets some configuration needed for Kafka Connect
-      - ./scripts/postgres/init-db-once.sql:/docker-entrypoint-initdb.d/init-db-once.sql
+      - ./postgres:/docker-entrypoint-initdb.d
 
   
   pgadmin:

@@ -1,0 +1,11 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+SciXHarvester.egg-info/PKG-INFO
+SciXHarvester.egg-info/SOURCES.txt
+SciXHarvester.egg-info/dependency_links.txt
+SciXHarvester.egg-info/entry_points.txt
+SciXHarvester.egg-info/requires.txt
+SciXHarvester.egg-info/top_level.txt

@@ -1,0 +1,2 @@
+#!/bin/sh
+exec chpst -u ads svlogd -tt /app/logs/APP
