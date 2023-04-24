@@ -1,3 +1,0 @@
-#!/bin/bash -e
-exec 2>&1
-exec chpst -u ads bash -c 'cd /app/SciXHarvester && alembic upgrade head && python3 /app/scripts/kafka_create_topics.py  && python3 run.py HARVESTER_APP'
