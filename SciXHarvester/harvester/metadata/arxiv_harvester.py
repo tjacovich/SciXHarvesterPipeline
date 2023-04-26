@@ -40,13 +40,14 @@ def arxiv_harvesting(app, job_request, producer):
         # Generate filepath for S3
         file_path = "/{}/{}".format(datestamp, record_id)
         # write record to S3
+        checksum = None
         for provider in app.s3Clients.keys():
             try:
                 checksum = app.s3Clients[provider].write_object_s3(
                     file_bytes=bytes(record, "utf-8"), object_name=file_path
                 )
             except Exception as e:
-                app.logger.exception(
+                app.logger.error(
                     "Failed to write to S3 provider: {} with Exception: {}".format(provider, e)
                 )
 
