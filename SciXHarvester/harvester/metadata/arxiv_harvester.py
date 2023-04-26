@@ -41,9 +41,14 @@ def arxiv_harvesting(app, job_request, producer):
         file_path = "/{}/{}".format(datestamp, record_id)
         # write record to S3
         for provider in app.s3Clients.keys():
-            checksum = app.s3Clients[provider].write_object_s3(
-                file_bytes=bytes(record, "utf-8"), object_name=file_path
-            )
+            try:
+                checksum = app.s3Clients[provider].write_object_s3(
+                    file_bytes=bytes(record, "utf-8"), object_name=file_path
+                )
+            except Exception as e:
+                app.logger.exception(
+                    "Failed to write to S3 provider: {} with Exception: {}".format(provider, e)
+                )
 
         if checksum:
             app.logger.debug("AWS checksum for {} is: {}".format(record_id, checksum))
@@ -63,7 +68,7 @@ def arxiv_harvesting(app, job_request, producer):
                     value_schema=harvester_output_schema,
                 )
         else:
-            app.logger.error("No checksum generated, AWS upload must have failed. Stopping.")
+            app.logger.error("No checksums generated, All S3 uploads must have failed. Stopping.")
             return "Error"
 
     return "Success"
