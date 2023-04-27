@@ -21,7 +21,8 @@ cd SciXHarvester/
 py.test
 ```
 
-### Testing against kafka
+### Testing Against Kafka
+#### The Kafka Environment
 In order to set up a full development environment, a kafka instance must be created that contains at least:
  - kafka broker
  - kafka zookeeper
@@ -37,7 +38,22 @@ The following can also be helpful:
 Next, we need to copy `config.py` to `local_config.py` and update the environment variables to point to reflect the values of the local environment.
 For `postgres`, we will need a  database to store harvester data. We will also need an `S3` bucket created either on `AWS` or locally on a `minIO` instance.
 We will also need to create Harvester input and output topics which can be done either through python or by using the `kafka-ui`.
-The relevant `AVRO` schemas must also be added to the schema registry using either python or the UI.
+The relevant `AVRO` schemas from `SciXHarvester/AVRO_schemas/` must also be added to the schema registry using either python or the UI.
+
+#### Launching The Harvester
+The harvester requires `librdkafka` be installed. The source can be found [here](https://github.com/edenhill/librdkafka).
+Installation on most `nix systems can be done by running the following:
+```bash
+git clone https://github.com/edenhill/librdkafka
+cd librdkafka && ./configure && make && make install && ldconfig
+```
+To launch the harvester, the following commands need to be run within the `SciXHarvester/` directory
+```bash
+#Start gRPC API
+python3 run.py HARVESTER_API
+#Start Harvester pipeline consumer and producer
+python3 run.py HARVESTER_APP
+```
 
 ## Sending commands to the gRPC API
 
