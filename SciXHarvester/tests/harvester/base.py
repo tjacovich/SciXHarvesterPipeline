@@ -10,10 +10,8 @@ class base_utils(TestCase):
     def mock_multiple_targets(mock_patches):
         """
         `mock_patches` is a list (or iterable) of mock.patch objects
-
         This is required when too many patches need to be applied in a nested
         `with` statement, since python has a hardcoded limit (~20).
-
         Based on: https://gist.github.com/msabramo/dffa53e4f29ec2e3682e
         """
         mocks = {}
