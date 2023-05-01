@@ -1,6 +1,4 @@
-[![Python CI actions](https://github.com/tjacovich/ADSHarvesterPipeline/actions/workflows/python_actions.yml/badge.svg)](https://github.com/tjacovich/ADSHarvesterPipeline/actions/workflows/python_actions.yml) [![Coverage Status](https://coveralls.io/repos/github/tjacovich/SciXHarvesterPipeline/badge.svg?branch=main)](https://coveralls.io/github/tjacovich/SciXHarvesterPipeline?branch=main)
-# Harvester Repository
-
+[![Python CI actions](https://github.com/tjacovich/ADSHarvesterPipeline/actions/workflows/python_actions.yml/badge.svg)](https://github.com/tjacovich/ADSHarvesterPipeline/actions/workflows/python_actions.yml) [![Coverage Status](https://coveralls.io/repos/github/tjacovich/SciXHarvesterPipeline/badge.svg)](https://coveralls.io/github/tjacovich/SciXHarvesterPipeline)
 ![Harvester Pipeline Flowchart](README_assets/Harvester_implementation.png?raw=true "Harvester Pipeline Flowchart")
 
 ## Setting Up a Development Environment.
