@@ -56,7 +56,7 @@ def arxiv_harvesting(app, job_request, producer):
             app.logger.debug("AWS checksum for {} is: {}".format(record_id, checksum))
             s3_key = file_path
             produce = db.write_harvester_record(
-                app, record_id, datetime.now(), s3_key, str(checksum), job_request.get("task")
+                app, record_id, datetime.now(), s3_key, checksum, job_request.get("task")
             )
             if produce:
                 producer_message = {
