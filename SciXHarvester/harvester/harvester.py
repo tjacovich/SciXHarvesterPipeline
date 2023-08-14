@@ -13,6 +13,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import harvester.metadata.arxiv_harvester as arxiv_harvester
+import harvester.metadata.classic_harvester as classic_harvester
 from harvester import db
 
 
@@ -103,6 +104,11 @@ class Harvester_APP:
         if job_request.get("task") == "ARXIV":
             if task_args.get("ingest_type") == "metadata":
                 job_request["status"] = arxiv_harvester.arxiv_harvesting(
+                    self, job_request, producer
+                )
+        elif job_request.get("task") == "CLASSIC":
+            if task_args.get("ingest_type") == "record":
+                job_request["status"] = classic_harvester.classic_harvesting(
                     self, job_request, producer
                 )
         else:
