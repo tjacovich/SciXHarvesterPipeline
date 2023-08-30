@@ -14,6 +14,8 @@ SCHEMA_REGISTRY_URL = "http://schema-registry:8081"
 # Harvester AVRO Schema Parameters
 HARVESTER_INPUT_SCHEMA = "HarvesterInputSchema"
 HARVESTER_INPUT_TOPIC = "HarvesterInput"
+HARVESTER_CLASSIC_SCHEMA = "HARVESTER_CLASSIC_TOPIC-value"
+HARVESTER_CLASSIC_TOPIC = "HARVESTER_CLASSIC_TOPIC"
 HARVESTER_OUTPUT_SCHEMA = "HarvesterOutputSchema"
 HARVESTER_OUTPUT_TOPIC = "HarvesterOutput"
 # S3 Configuration
