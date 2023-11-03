@@ -5,10 +5,9 @@ Revises: 6bfebb4af6ba
 Create Date: 2023-02-08 16:19:29.622107
 
 """
-import uuid
-
 import sqlalchemy as sa
 from alembic import op
+from SciXPipelineUtils.scix_uuid import scix_uuid as uuid
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
@@ -26,7 +25,7 @@ def upgrade() -> None:
             "id",
             postgresql.UUID(as_uuid=True),
             primary_key=True,
-            default=uuid.uuid4,
+            default=uuid.uuid7,
             nullable=False,
         ),
         sa.Column("s3_key", sa.String(), nullable=True),

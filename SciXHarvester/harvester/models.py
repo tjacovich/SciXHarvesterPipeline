@@ -1,6 +1,6 @@
 import enum
-import uuid
 
+from SciXPipelineUtils.scix_uuid import scix_uuid as uuid
 from sqlalchemy import Column, DateTime, Enum, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
@@ -44,7 +44,7 @@ class Harvester_record(Base):
     """
 
     __tablename__ = "harvester_records"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid7)
     s3_key = Column(String)
     date = Column(DateTime)
     checksum = Column(String)

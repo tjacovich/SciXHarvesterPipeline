@@ -1,9 +1,9 @@
-import uuid
 from unittest import TestCase
 
 import base
 from confluent_kafka.avro import AvroProducer
 from mock import patch
+from SciXPipelineUtils.scix_uuid import scix_uuid as uuid
 
 import harvester.metadata.arxiv_harvester as arxiv_harvester
 from harvester import db
@@ -33,7 +33,7 @@ class test_harvester(TestCase):
 
     def test_writing_harvester_output(self):
         mock_app = Harvester_APP(proj_home="SciXHarvester/tests/stubdata/")
-        record_id = uuid.uuid4()
+        record_id = uuid.uuid7()
         date = "2023-04-28 17:48:29.354791"
         s3_key = "/20230428/7eceaca5-9b62-4e10-a153-a882b209df9f"
         checksum = "947e77d2c4b4ec4ffb55a089e92bc538"

@@ -1,12 +1,12 @@
 import logging as logger
 import re
 import time
-import uuid
 from datetime import datetime
 
 import requests
 from adsingestp.parsers import arxiv
 from SciXPipelineUtils import utils
+from SciXPipelineUtils.scix_uuid import scix_uuid as uuid
 
 from harvester import db
 from harvester.base.OAIHarvester import OAIHarvester as OAI
@@ -37,7 +37,7 @@ def arxiv_harvesting(app, job_request, producer):
 
     for record in harvester:
         # Assign ID to new record
-        record_id = uuid.uuid4()
+        record_id = uuid.uuid7()
         # Generate filepath for S3
         file_path = "/{}/{}".format(datestamp, record_id)
         # write record to S3
