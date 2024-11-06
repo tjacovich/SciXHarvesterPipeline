@@ -32,3 +32,5 @@ MINIO_BUCKET_NAME = "scix-harvester"
 MINIO_S3_URL = "http://minio:9000"
 # OAI Harvesting urls
 ARXIV_OAI_URL = "https://export.arxiv.org/oai2"
+JAEGER_PORT = 6831
+JAGER_HOST = "localhost"

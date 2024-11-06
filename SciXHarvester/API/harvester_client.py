@@ -83,7 +83,7 @@ def output_message(args):
 
 
 async def run() -> None:
-    schema_client = SchemaRegistryClient({"url": "http://localhost:8081"})
+    schema_client = SchemaRegistryClient({"url": "http://localhost:8000/schema-registry"})
 
     logger = Logging(logging)
     schema = get_schema(logger, schema_client, "HarvesterInputSchema")
@@ -91,7 +91,7 @@ async def run() -> None:
     avroserialhelper = AvroSerialHelper(schema)
 
     args = input_parser(sys.argv[1:])
-    async with grpc.aio.insecure_channel("localhost:50051") as channel:
+    async with grpc.aio.insecure_channel("localhost:8000") as channel:
         s = output_message(args)
         if s["task"] == "MONITOR":
             try:

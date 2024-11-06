@@ -7,6 +7,15 @@ from datetime import datetime
 import redis
 from confluent_kafka.avro import AvroConsumer, AvroProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
+from opentelemetry import trace
+from opentelemetry.exporter import jaeger
+from opentelemetry.instrumentation.confluent_kafka import ConfluentKafkaInstrumentor
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
+    ConsoleSpanExporter,
+    SimpleSpanProcessor,
+)
 from SciXPipelineUtils import utils
 from SciXPipelineUtils.s3_methods import load_s3_providers
 from sqlalchemy import create_engine
@@ -18,6 +27,29 @@ from harvester import db
 
 def init_pipeline(proj_home):
     app = Harvester_APP(proj_home)
+    # Initiate OpenTelemetry span exporter
+    trace.set_tracer_provider(TracerProvider())
+    # create a JaegerSpanExporter
+    jaeger_exporter = jaeger.JaegerSpanExporter(
+        service_name="harvester-pipeline",
+        # configure agent
+        agent_host_name=app.config.get("JAEGER_HOST", "localhost"),
+        agent_port=app.config.get("JAEGER_PORT", "6831"),
+        # optional: configure also collector
+        # collector_endpoint='http://localhost:14268/api/traces?format=jaeger.thrift',
+        # username=xxxx, # optional
+        # password=xxxx, # optional
+    )
+    span_processor = BatchSpanProcessor(jaeger_exporter)
+    trace.get_tracer_provider().add_span_processor(span_processor)
+    console_exporter = ConsoleSpanExporter()
+    console_span_processor = SimpleSpanProcessor(console_exporter)
+    trace.get_tracer_provider().add_span_processor(console_span_processor)
+    ConfluentKafkaInstrumentor().instrument()
+
+    # tracer = trace.get_tracer(__name__)
+    # with tracer.start_as_current_span("my_span"):
+    #     print("Hello, OpenTelemetry!")
     app.schema_client = SchemaRegistryClient({"url": app.config.get("SCHEMA_REGISTRY_URL")})
     schema = utils.get_schema(app, app.schema_client, app.config.get("HARVESTER_INPUT_SCHEMA"))
     consumer = AvroConsumer(

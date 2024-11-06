@@ -3,6 +3,10 @@ README.md
 pyproject.toml
 setup.cfg
 setup.py
+SciXHarvester/__init__.py
+SciXHarvester/config.py
+SciXHarvester/local_config.py
+SciXHarvester/run.py
 SciXHarvester.egg-info/PKG-INFO
 SciXHarvester.egg-info/SOURCES.txt
 SciXHarvester.egg-info/dependency_links.txt
