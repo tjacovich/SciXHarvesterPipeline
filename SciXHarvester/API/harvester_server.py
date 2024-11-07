@@ -15,10 +15,11 @@ from confluent_kafka.avro import AvroProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.grpc import GrpcInstrumentorClient
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from SciXPipelineUtils import utils
 from SciXPipelineUtils.avro_serializer import AvroSerialHelper
 from sqlalchemy import create_engine
@@ -34,7 +35,9 @@ from harvester import db
 resource = Resource(attributes={"service.name": "harvester-API"})
 
 trace.set_tracer_provider(TracerProvider(resource=resource))
-trace.get_tracer_provider().add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+jaeger_exporter = OTLPSpanExporter()
+span_processor = BatchSpanProcessor(jaeger_exporter)
+trace.get_tracer_provider().add_span_processor(span_processor)
 
 grpc_client_instrumentor = GrpcInstrumentorClient()
 grpc_client_instrumentor.instrument()
