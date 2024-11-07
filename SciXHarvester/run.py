@@ -13,7 +13,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.action == "HARVESTER_APP":
-        proj_home = os.path.realpath("/app/SciXHarvester/")
+        proj_home = os.path.dirname(os.path.realpath(__file__))
+        print(proj_home)
         harvester.init_pipeline(proj_home)
 
     elif args.action == "HARVESTER_API":

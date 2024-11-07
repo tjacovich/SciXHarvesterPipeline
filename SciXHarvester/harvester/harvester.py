@@ -8,8 +8,9 @@ import redis
 from confluent_kafka.avro import AvroConsumer, AvroProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from opentelemetry import trace
-from opentelemetry.exporter import jaeger
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.confluent_kafka import ConfluentKafkaInstrumentor
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
     BatchSpanProcessor,
@@ -27,19 +28,11 @@ from harvester import db
 
 def init_pipeline(proj_home):
     app = Harvester_APP(proj_home)
+    resource = Resource(attributes={"service.name": "harvester"})
     # Initiate OpenTelemetry span exporter
-    trace.set_tracer_provider(TracerProvider())
+    trace.set_tracer_provider(TracerProvider(resource=resource))
     # create a JaegerSpanExporter
-    jaeger_exporter = jaeger.JaegerSpanExporter(
-        service_name="harvester-pipeline",
-        # configure agent
-        agent_host_name=app.config.get("JAEGER_HOST", "localhost"),
-        agent_port=app.config.get("JAEGER_PORT", "6831"),
-        # optional: configure also collector
-        # collector_endpoint='http://localhost:14268/api/traces?format=jaeger.thrift',
-        # username=xxxx, # optional
-        # password=xxxx, # optional
-    )
+    jaeger_exporter = OTLPSpanExporter()
     span_processor = BatchSpanProcessor(jaeger_exporter)
     trace.get_tracer_provider().add_span_processor(span_processor)
     console_exporter = ConsoleSpanExporter()
@@ -47,9 +40,6 @@ def init_pipeline(proj_home):
     trace.get_tracer_provider().add_span_processor(console_span_processor)
     ConfluentKafkaInstrumentor().instrument()
 
-    # tracer = trace.get_tracer(__name__)
-    # with tracer.start_as_current_span("my_span"):
-    #     print("Hello, OpenTelemetry!")
     app.schema_client = SchemaRegistryClient({"url": app.config.get("SCHEMA_REGISTRY_URL")})
     schema = utils.get_schema(app, app.schema_client, app.config.get("HARVESTER_INPUT_SCHEMA"))
     consumer = AvroConsumer(
