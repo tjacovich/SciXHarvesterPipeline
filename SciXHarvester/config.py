@@ -34,5 +34,5 @@ MINIO_S3_URL = "http://minio:9000"
 ARXIV_OAI_URL = "https://export.arxiv.org/oai2"
 JAEGER_PORT = 6831
 JAGER_HOST = "localhost"
-OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://localhost"
-OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost"
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://localhost:4318"
+OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318"
