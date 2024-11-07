@@ -71,7 +71,7 @@ class HarvesterServer(TestCase):
         with grpc.insecure_channel(f"localhost:{self.port}") as channel:
             stub = harvester_grpc.HarvesterInitStub(channel, self.avroserialhelper)
             with pytest.raises(grpc.RpcError):
-                stub.initHarvester(s)
+                next(stub.initHarvester(s))
 
     def test_Harvester_server_init(self):
         s = {

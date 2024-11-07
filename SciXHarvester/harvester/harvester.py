@@ -56,7 +56,7 @@ def init_pipeline(proj_home):
         {
             "bootstrap.servers": app.config.get("KAFKA_BROKER"),
             "schema.registry.url": app.config.get("SCHEMA_REGISTRY_URL"),
-            "auto.register.schemas": False,
+            # "auto.register.schemas": False,
         }
     )
     app.logger.info("Starting Harvester APP")
